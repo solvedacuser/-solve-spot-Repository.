@@ -113,10 +113,6 @@ export function getAuthErrorMessage(error: SupabaseErrorLike | null | undefined,
 }
 
 export function getCallbackErrorMessage(error: string | null) {
-  if (error === "missing_code") {
-    return "인증 코드가 없어 이메일 확인을 완료하지 못했습니다.";
-  }
-
   if (error === "confirm_failed") {
     return "이메일 인증을 완료하지 못했습니다. 다시 로그인하거나 메일 링크를 다시 열어주세요.";
   }

@@ -48,7 +48,7 @@ export async function signupAction(_: AuthActionState, formData: FormData): Prom
   }
 
   const supabase = await createClient();
-  const redirectTo = `${await getRequestOrigin()}/auth/callback`;
+  const redirectTo = `${await getRequestOrigin()}/auth/confirm`;
   const { email, password, displayName, bojHandle } = parsed.data;
 
   const { data, error } = await supabase.auth.signUp({
