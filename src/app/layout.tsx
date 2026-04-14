@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Mono, Space_Grotesk } from "next/font/google";
+import { SiteNav } from "@/components/site-nav";
+import { createClient } from "@/utils/supabase/server";
 import "./globals.css";
 
 const headingFont = Space_Grotesk({
@@ -18,11 +20,25 @@ export const metadata: Metadata = {
   description: "solved.ac handle lookup, bio lookup, recommendation, and solved verification tools.",
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const { data: profile } = user
+    ? await supabase.from("profiles").select("display_name").eq("id", user.id).maybeSingle()
+    : { data: null };
+
   return (
     <html lang="ko" className={`${headingFont.variable} ${monoFont.variable}`}>
       <body className="font-sans text-ink antialiased">
         <div className="noise-overlay" />
+        <SiteNav
+          isAuthenticated={Boolean(user)}
+          userEmail={user?.email}
+          displayName={profile?.display_name}
+        />
         {children}
       </body>
     </html>
