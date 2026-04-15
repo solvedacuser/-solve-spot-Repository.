@@ -6,7 +6,7 @@ export default function ActiveContent({
   activeCard: ActiveCardType;
 }) {
   const activeContent = {
-    teamStudy: <img src="/exaple.png" />,
+    teamStudy: <img src="/example.png" />,
     recommend: <img src="/example.png" />,
     share: <img src="/example.png" />,
     chart: <img src="/example.png" />,
