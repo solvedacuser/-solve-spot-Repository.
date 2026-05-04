@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
+import { LeetCodeAppError, toLeetCodeApiErrorPayload } from "@/lib/leetcode/errors";
 import { SolvedAcAppError, toApiErrorPayload } from "@/lib/solvedac/errors";
 
 export function apiErrorResponse(error: unknown) {
-  const payload = toApiErrorPayload(error);
+  const payload = error instanceof LeetCodeAppError ? toLeetCodeApiErrorPayload(error) : toApiErrorPayload(error);
   return NextResponse.json({ error: payload }, { status: payload.status });
 }
 
