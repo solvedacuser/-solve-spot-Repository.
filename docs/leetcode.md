@@ -22,6 +22,7 @@
 | Source | Role | Use In This Project |
 | --- | --- | --- |
 | [`leetcode-graphql-queries`](https://github.com/akarsh1995/leetcode-graphql-queries) | Primary GraphQL query source | Use this as the query reference for profile, problemset, problem detail, recent accepted submissions, and session-based question status. |
+| [`alfa-leetcode-api`](https://github.com/alfaarghya/alfa-leetcode-api) | Secondary API inventory and query source | Use as a reference for endpoint candidates and compact GraphQL query documents. Do not call the hosted alfa API from this app. |
 | [`leetcode-tui`](https://github.com/akarsh1995/leetcode-tui) | Secondary implementation reference | Use only as a supplemental reference for cookie-based LeetCode clients, GraphQL request abstraction, and run/submit flows. Do not depend on it for the public username MVP. |
 
 ## Reference File Roles
@@ -30,6 +31,7 @@
 | [`profile_page.graphql`](https://github.com/akarsh1995/leetcode-graphql-queries/blob/main/profile_page/profile_page.graphql) | `userPublicProfile`, `userProblemsSolved`, `languageStats`, `skillStats`, `userContestRankingInfo`, `recentAcSubmissions` | Main source for public username profile data, bio, solved statistics, optional stats, and recent accepted submissions. |
 | [`problemset_page.graphql`](https://github.com/akarsh1995/leetcode-graphql-queries/blob/main/problemset_page/problemset_page.graphql) | `problemsetQuestionList` | Main source for recommendation candidates using list filters such as difficulty, tags, `limit`, and `skip`. |
 | [`problem_solve_page.graphql`](https://github.com/akarsh1995/leetcode-graphql-queries/blob/main/problem_solve_page/problem_solve_page.graphql) | `questionTitle`, `userQuestionStatus`, `submissionList`, `questionSubmissionList`, problem detail queries | Useful for problem metadata and session-based solved status. Session-dependent behavior is optional and out of MVP unless explicitly requested. |
+| [`alfa-leetcode-api/src/GQLQueries`](https://github.com/alfaarghya/alfa-leetcode-api/tree/main/src/GQLQueries) | `languageStats`, `skillStats`, `userProfileCalendar`, `userContestRankingInfo`, `dailyProblem`, `selectProblem`, `officialSolution`, `problemList` | Useful for candidate endpoint discovery and smaller query examples. Keep local response contracts narrower than alfa's broad REST responses. |
 | [`leetcode-tui`](https://github.com/akarsh1995/leetcode-tui) repository | cookie config, GraphQL client behavior, run/submit flows | Use only when designing future authenticated features. The current public username MVP should not import or wrap this Rust project. |
 
 ## solved.ac To LeetCode Capability Map
@@ -76,8 +78,37 @@
 | --- | --- | --- | --- |
 | `/api/leetcode/user?username=...` | `GET` | Public user profile and solved stats | Yes, short TTL |
 | `/api/leetcode/bio?username=...` | `GET` | Public user bio only | Yes, short TTL |
+| `/api/leetcode/language?username=...` | `GET` | Public language solved counts | Yes, short TTL |
+| `/api/leetcode/skill?username=...` | `GET` | Public tag solved counts grouped by skill level | Yes, short TTL |
+| `/api/leetcode/calendar?username=...&year=2026` | `GET` | Public submission calendar summary | Yes, short TTL |
+| `/api/leetcode/contest?username=...` | `GET` | Public contest ranking and contest history | Yes, short TTL |
 | `/api/leetcode/recommend` | `POST` | Problem candidates with explicit public exclusion semantics | No by default |
 | `/api/leetcode/verify-problem` | `POST` | Recent accepted verification by public username, or optional session status later | No by default |
+
+## Candidate API Extensions
+These endpoints came from `alfa-leetcode-api` and `leetcode-graphql-queries`. P1 entries are implemented as profile extensions; lower-priority entries remain follow-up candidates.
+
+| Priority | Endpoint | Method | Purpose | Suggested Upstream Query | Cache | Notes |
+| --- | --- | --- | --- | --- | --- | --- |
+| P1 | `/api/leetcode/language?username=...` | `GET` | Public language solved counts | `languageStats` | Yes, short TTL | Small, profile-adjacent response from `matchedUser.languageProblemCount`. |
+| P1 | `/api/leetcode/skill?username=...` | `GET` | Public tag solved counts grouped by skill level | `skillStats` | Yes, short TTL | Return `fundamental`, `intermediate`, and `advanced` groups with `tagName`, `tagSlug`, and `problemsSolved`. |
+| P1 | `/api/leetcode/calendar?username=...&year=2026` | `GET` | Public submission calendar summary | `userProfileCalendar` | Yes, short TTL | Validate `year`; `submissionCalendar` is a JSON-encoded string upstream, so parse or return intentionally as a string. |
+| P1 | `/api/leetcode/contest?username=...` | `GET` | Public contest ranking and contest history | `userContestRankingInfo` | Yes, short TTL | Useful profile extension. Treat missing contest ranking as an empty or null contest profile, not necessarily `NOT_FOUND`. |
+| P2 | `/api/leetcode/badges?username=...` | `GET` | Public badges and upcoming badges | `userBadges` | Yes, short TTL | Useful for profile UI, but less important than stats. |
+| P2 | `/api/leetcode/problems?limit=20&skip=0&difficulty=EASY&tags=array+hash-table` | `GET` | Public problem list without recommendation semantics | `problemsetQuestionList` | Yes, short TTL | Reuse the recommendation candidate mapping, but do not apply recent accepted exclusions. Exclude paid-only by default unless product decides otherwise. |
+| P2 | `/api/leetcode/problem?titleSlug=two-sum` | `GET` | Public problem detail | `questionTitle`, `questionContent`, `singleQuestionTopicTags`, `questionStats`, or compact `selectProblem` | Yes, short TTL | Keep the response compact. Avoid returning broad raw page payloads unless the endpoint is explicitly marked raw/debug. |
+| P2 | `/api/leetcode/daily` | `GET` | Daily coding challenge metadata | `questionOfToday` or compact `dailyProblem` | Yes, short TTL | Cache briefly and derive the problem URL locally from `link` or `titleSlug`. |
+| P3 | `/api/leetcode/official-solution?titleSlug=two-sum` | `GET` | Official solution metadata/content when visible | `officialSolution` | Yes, short TTL | Must preserve `paidOnly` and `canSeeDetail`; never imply paid content is available when LeetCode withholds it. |
+| P3 | `/api/leetcode/submissions?username=...&limit=20` | `GET` | Public recent submissions | `recentSubmissionList` | Yes, short TTL | Optional diagnostics/profile feature. Do not use it to claim complete solved history. |
+
+### Candidate Extension Rules
+- Keep all candidate endpoints under `src/app/api/leetcode/*` and all upstream access under `src/lib/leetcode/*`.
+- Add Zod request validation and upstream response validation before exposing any candidate endpoint.
+- Prefer compact, purpose-specific query documents over broad page dumps from reference repositories.
+- Keep hosted `alfa-leetcode-api` as a reference only; this app should call LeetCode GraphQL directly from server-only code.
+- Do not add discussion, check-in, mutation, run, submit, or session-only behavior unless authenticated LeetCode support is explicitly scoped.
+- Do not use `userProgressQuestionList` or related session progress queries as a public complete solved-problem source.
+- For any candidate that includes `question.status`, `isFavor`, `isLiked`, or other viewer-specific fields, document whether the field is anonymous, session-derived, or omitted.
 
 ## Identifier Rules
 - Use `titleSlug` as the primary problem identifier.

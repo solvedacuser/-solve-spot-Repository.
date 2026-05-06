@@ -4,8 +4,12 @@ import { useState, useTransition } from "react";
 import type {
   ApiErrorPayload,
   LeetCodeBioResponse,
+  LeetCodeCalendarResponse,
+  LeetCodeContestResponse,
   LeetCodeDifficulty,
+  LeetCodeLanguageResponse,
   LeetCodeRecommendationResponse,
+  LeetCodeSkillResponse,
   LeetCodeUserResponse,
   LeetCodeVerifyProblemResponse,
 } from "@/lib/leetcode/types";
@@ -95,6 +99,11 @@ function SubmitButton({ disabled, pendingLabel, label }: { disabled: boolean; pe
 export function LeetCodeWorkbench() {
   const [userInfoUsername, setUserInfoUsername] = useState("leetcode");
   const [bioUsername, setBioUsername] = useState("leetcode");
+  const [languageUsername, setLanguageUsername] = useState("leetcode");
+  const [skillUsername, setSkillUsername] = useState("leetcode");
+  const [calendarUsername, setCalendarUsername] = useState("leetcode");
+  const [calendarYear, setCalendarYear] = useState("2026");
+  const [contestUsername, setContestUsername] = useState("leetcode");
   const [verifyUsername, setVerifyUsername] = useState("leetcode");
   const [verifyTitleSlug, setVerifyTitleSlug] = useState("two-sum");
   const [verifyRecentLimit, setVerifyRecentLimit] = useState("100");
@@ -117,6 +126,22 @@ export function LeetCodeWorkbench() {
     data: null,
     error: null,
   });
+  const [languageState, setLanguageState] = useState<FetchState<LeetCodeLanguageResponse>>({
+    data: null,
+    error: null,
+  });
+  const [skillState, setSkillState] = useState<FetchState<LeetCodeSkillResponse>>({
+    data: null,
+    error: null,
+  });
+  const [calendarState, setCalendarState] = useState<FetchState<LeetCodeCalendarResponse>>({
+    data: null,
+    error: null,
+  });
+  const [contestState, setContestState] = useState<FetchState<LeetCodeContestResponse>>({
+    data: null,
+    error: null,
+  });
   const [recommendState, setRecommendState] = useState<FetchState<LeetCodeRecommendationResponse>>({
     data: null,
     error: null,
@@ -128,6 +153,10 @@ export function LeetCodeWorkbench() {
 
   const [isUserPending, startUserTransition] = useTransition();
   const [isBioPending, startBioTransition] = useTransition();
+  const [isLanguagePending, startLanguageTransition] = useTransition();
+  const [isSkillPending, startSkillTransition] = useTransition();
+  const [isCalendarPending, startCalendarTransition] = useTransition();
+  const [isContestPending, startContestTransition] = useTransition();
   const [isRecommendPending, startRecommendTransition] = useTransition();
   const [isVerifyPending, startVerifyTransition] = useTransition();
 
@@ -155,6 +184,64 @@ export function LeetCodeWorkbench() {
         setBioState({ data, error: null });
       } catch (error) {
         setBioState({ data: null, error: error as ApiErrorPayload });
+      }
+    });
+  };
+
+  const submitLanguage = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    startLanguageTransition(async () => {
+      try {
+        const data = await callApi<LeetCodeLanguageResponse>(
+          `/api/leetcode/language?username=${encodeURIComponent(languageUsername.trim())}`,
+        );
+        setLanguageState({ data, error: null });
+      } catch (error) {
+        setLanguageState({ data: null, error: error as ApiErrorPayload });
+      }
+    });
+  };
+
+  const submitSkill = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    startSkillTransition(async () => {
+      try {
+        const data = await callApi<LeetCodeSkillResponse>(
+          `/api/leetcode/skill?username=${encodeURIComponent(skillUsername.trim())}`,
+        );
+        setSkillState({ data, error: null });
+      } catch (error) {
+        setSkillState({ data: null, error: error as ApiErrorPayload });
+      }
+    });
+  };
+
+  const submitCalendar = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    startCalendarTransition(async () => {
+      try {
+        const data = await callApi<LeetCodeCalendarResponse>(
+          `/api/leetcode/calendar?username=${encodeURIComponent(calendarUsername.trim())}&year=${encodeURIComponent(
+            calendarYear.trim(),
+          )}`,
+        );
+        setCalendarState({ data, error: null });
+      } catch (error) {
+        setCalendarState({ data: null, error: error as ApiErrorPayload });
+      }
+    });
+  };
+
+  const submitContest = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    startContestTransition(async () => {
+      try {
+        const data = await callApi<LeetCodeContestResponse>(
+          `/api/leetcode/contest?username=${encodeURIComponent(contestUsername.trim())}`,
+        );
+        setContestState({ data, error: null });
+      } catch (error) {
+        setContestState({ data: null, error: error as ApiErrorPayload });
       }
     });
   };
@@ -297,6 +384,227 @@ export function LeetCodeWorkbench() {
               <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-slate-700">
                 {bioState.data.bio || "No public bio."}
               </p>
+            </div>
+          ) : null}
+        </ToolCard>
+
+        <ToolCard
+          eyebrow="Language"
+          title="Language stats"
+          description="Fetch public solved counts by programming language for a LeetCode username."
+        >
+          <form className="space-y-4" onSubmit={submitLanguage}>
+            <label className="block">
+              <span className="mb-2 block text-sm font-medium text-slate-700">Username</span>
+              <input
+                value={languageUsername}
+                onChange={(event) => setLanguageUsername(event.target.value)}
+                className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-100"
+                placeholder="leetcode"
+              />
+            </label>
+            <SubmitButton disabled={isLanguagePending} pendingLabel="Loading..." label="Lookup" />
+          </form>
+          <div className="mt-4">
+            <ErrorBanner error={languageState.error} />
+          </div>
+          {languageState.data ? (
+            <div className="mt-4 overflow-hidden rounded-[24px] border border-slate-200">
+              <table className="min-w-full divide-y divide-slate-200 text-left text-sm">
+                <thead className="bg-slate-50 text-slate-500">
+                  <tr>
+                    <th className="px-4 py-3 font-medium">Language</th>
+                    <th className="px-4 py-3 font-medium">Solved</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 bg-white">
+                  {languageState.data.languages.map((item) => (
+                    <tr key={item.languageName}>
+                      <td className="px-4 py-3 font-medium text-slate-900">{item.languageName}</td>
+                      <td className="px-4 py-3 text-slate-700">{item.problemsSolved}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : null}
+        </ToolCard>
+
+        <ToolCard
+          eyebrow="Skill"
+          title="Tag skill stats"
+          description="Read public solved counts by LeetCode skill group and topic tag."
+        >
+          <form className="space-y-4" onSubmit={submitSkill}>
+            <label className="block">
+              <span className="mb-2 block text-sm font-medium text-slate-700">Username</span>
+              <input
+                value={skillUsername}
+                onChange={(event) => setSkillUsername(event.target.value)}
+                className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-100"
+                placeholder="leetcode"
+              />
+            </label>
+            <SubmitButton disabled={isSkillPending} pendingLabel="Loading..." label="Lookup" />
+          </form>
+          <div className="mt-4">
+            <ErrorBanner error={skillState.error} />
+          </div>
+          {skillState.data ? (
+            <div className="mt-4 grid gap-4">
+              {(["fundamental", "intermediate", "advanced"] as const).map((groupName) => (
+                <div key={groupName} className="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
+                  <div className="text-xs uppercase tracking-[0.2em] text-slate-500">{groupName}</div>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {skillState.data!.groups[groupName].length > 0 ? (
+                      skillState.data!.groups[groupName].map((item) => (
+                        <span
+                          key={item.tagSlug}
+                          className="rounded-full border border-slate-200 bg-white px-3 py-1 text-sm text-slate-700"
+                        >
+                          {item.tagName}: {item.problemsSolved}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="text-sm text-slate-500">No public stats.</span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : null}
+        </ToolCard>
+
+        <ToolCard
+          eyebrow="Calendar"
+          title="Submission calendar"
+          description="Fetch a public yearly activity summary and parsed submission calendar."
+        >
+          <form className="grid gap-4 md:grid-cols-[1fr_150px]" onSubmit={submitCalendar}>
+            <label className="block">
+              <span className="mb-2 block text-sm font-medium text-slate-700">Username</span>
+              <input
+                value={calendarUsername}
+                onChange={(event) => setCalendarUsername(event.target.value)}
+                className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-amber-500 focus:ring-4 focus:ring-amber-100"
+                placeholder="leetcode"
+              />
+            </label>
+            <label className="block">
+              <span className="mb-2 block text-sm font-medium text-slate-700">Year</span>
+              <input
+                type="number"
+                min={2008}
+                max={2100}
+                value={calendarYear}
+                onChange={(event) => setCalendarYear(event.target.value)}
+                className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-amber-500 focus:ring-4 focus:ring-amber-100"
+              />
+            </label>
+            <div className="md:col-span-2">
+              <SubmitButton disabled={isCalendarPending} pendingLabel="Loading..." label="Lookup" />
+            </div>
+          </form>
+          <div className="mt-4">
+            <ErrorBanner error={calendarState.error} />
+          </div>
+          {calendarState.data ? (
+            <div className="mt-4 space-y-4">
+              <div className="grid gap-3 sm:grid-cols-2">
+                <ResultField label="Year" value={calendarState.data.year} />
+                <ResultField label="Streak" value={calendarState.data.streak} />
+                <ResultField label="Active days" value={calendarState.data.totalActiveDays} />
+                <ResultField label="Calendar entries" value={Object.keys(calendarState.data.submissionCalendar).length} />
+                <ResultField label="Active years" value={calendarState.data.activeYears.join(", ") || "None"} />
+                <ResultField label="Badges" value={calendarState.data.dccBadges.length} />
+              </div>
+              <div className="overflow-hidden rounded-[24px] border border-slate-200">
+                <table className="min-w-full divide-y divide-slate-200 text-left text-sm">
+                  <thead className="bg-slate-50 text-slate-500">
+                    <tr>
+                      <th className="px-4 py-3 font-medium">Timestamp</th>
+                      <th className="px-4 py-3 font-medium">Submissions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 bg-white">
+                    {Object.entries(calendarState.data.submissionCalendar)
+                      .slice(0, 8)
+                      .map(([timestamp, count]) => (
+                        <tr key={timestamp}>
+                          <td className="px-4 py-3 font-mono text-xs text-slate-600">{timestamp}</td>
+                          <td className="px-4 py-3 text-slate-700">{count}</td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          ) : null}
+        </ToolCard>
+
+        <ToolCard
+          eyebrow="Contest"
+          title="Contest ranking"
+          description="Fetch public contest ranking and contest history for a LeetCode username."
+        >
+          <form className="space-y-4" onSubmit={submitContest}>
+            <label className="block">
+              <span className="mb-2 block text-sm font-medium text-slate-700">Username</span>
+              <input
+                value={contestUsername}
+                onChange={(event) => setContestUsername(event.target.value)}
+                className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-amber-500 focus:ring-4 focus:ring-amber-100"
+                placeholder="leetcode"
+              />
+            </label>
+            <SubmitButton disabled={isContestPending} pendingLabel="Loading..." label="Lookup" />
+          </form>
+          <div className="mt-4">
+            <ErrorBanner error={contestState.error} />
+          </div>
+          {contestState.data ? (
+            <div className="mt-4 space-y-4">
+              <div className="grid gap-3 sm:grid-cols-2">
+                <ResultField
+                  label="Rating"
+                  value={contestState.data.ranking ? contestState.data.ranking.rating.toFixed(1) : "Unrated"}
+                />
+                <ResultField
+                  label="Global rank"
+                  value={contestState.data.ranking?.globalRanking ?? "Unranked"}
+                />
+                <ResultField
+                  label="Attended"
+                  value={contestState.data.ranking?.attendedContestsCount ?? 0}
+                />
+                <ResultField label="History rows" value={contestState.data.history.length} />
+              </div>
+              <div className="overflow-hidden rounded-[24px] border border-slate-200">
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-slate-200 text-left text-sm">
+                    <thead className="bg-slate-50 text-slate-500">
+                      <tr>
+                        <th className="px-4 py-3 font-medium">Contest</th>
+                        <th className="px-4 py-3 font-medium">Solved</th>
+                        <th className="px-4 py-3 font-medium">Ranking</th>
+                        <th className="px-4 py-3 font-medium">Rating</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 bg-white">
+                      {contestState.data.history.slice(0, 6).map((item) => (
+                        <tr key={`${item.contest.title}-${item.contest.startTime}`}>
+                          <td className="px-4 py-3 font-medium text-slate-900">{item.contest.title}</td>
+                          <td className="px-4 py-3 text-slate-700">
+                            {item.problemsSolved}/{item.totalProblems}
+                          </td>
+                          <td className="px-4 py-3 text-slate-700">{item.ranking}</td>
+                          <td className="px-4 py-3 text-slate-700">{item.rating.toFixed(1)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
           ) : null}
         </ToolCard>

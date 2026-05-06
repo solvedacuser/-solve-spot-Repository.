@@ -1,15 +1,27 @@
 import { z, ZodError, type ZodTypeAny } from "zod";
 import {
+  LEETCODE_CALENDAR_QUERY,
+  LEETCODE_CONTEST_QUERY,
+  LEETCODE_LANGUAGE_QUERY,
   LEETCODE_PROBLEMSET_QUERY,
   LEETCODE_RECENT_ACCEPTED_QUERY,
+  LEETCODE_SKILL_QUERY,
   LEETCODE_USER_QUERY,
 } from "@/lib/leetcode/queries";
 import {
+  leetCodeCalendarGraphQLDataSchema,
+  leetCodeContestGraphQLDataSchema,
+  leetCodeLanguageGraphQLDataSchema,
   leetCodeProblemsetGraphQLDataSchema,
   leetCodeRecentAcceptedGraphQLDataSchema,
+  leetCodeSkillGraphQLDataSchema,
   leetCodeUserGraphQLDataSchema,
+  type LeetCodeCalendarGraphQLData,
+  type LeetCodeContestGraphQLData,
+  type LeetCodeLanguageGraphQLData,
   type LeetCodeProblemsetGraphQLData,
   type LeetCodeRecentAcceptedGraphQLData,
+  type LeetCodeSkillGraphQLData,
   type LeetCodeUserGraphQLData,
 } from "@/lib/leetcode/schemas";
 import { LeetCodeAppError, mapLeetCodeHttpStatusToError } from "@/lib/leetcode/errors";
@@ -147,5 +159,44 @@ export async function getLeetCodeProblemsetData({
     },
     leetCodeProblemsetGraphQLDataSchema,
     "LeetCode returned an invalid problemset payload.",
+  );
+}
+
+export async function getLeetCodeLanguageData(username: string): Promise<LeetCodeLanguageGraphQLData> {
+  return requestGraphQL(
+    LEETCODE_LANGUAGE_QUERY,
+    { username },
+    leetCodeLanguageGraphQLDataSchema,
+    "LeetCode returned an invalid language stats payload.",
+  );
+}
+
+export async function getLeetCodeSkillData(username: string): Promise<LeetCodeSkillGraphQLData> {
+  return requestGraphQL(
+    LEETCODE_SKILL_QUERY,
+    { username },
+    leetCodeSkillGraphQLDataSchema,
+    "LeetCode returned an invalid skill stats payload.",
+  );
+}
+
+export async function getLeetCodeCalendarData(
+  username: string,
+  year: number,
+): Promise<LeetCodeCalendarGraphQLData> {
+  return requestGraphQL(
+    LEETCODE_CALENDAR_QUERY,
+    { username, year },
+    leetCodeCalendarGraphQLDataSchema,
+    "LeetCode returned an invalid calendar payload.",
+  );
+}
+
+export async function getLeetCodeContestData(username: string): Promise<LeetCodeContestGraphQLData> {
+  return requestGraphQL(
+    LEETCODE_CONTEST_QUERY,
+    { username },
+    leetCodeContestGraphQLDataSchema,
+    "LeetCode returned an invalid contest payload.",
   );
 }

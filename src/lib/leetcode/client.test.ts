@@ -1,5 +1,11 @@
 import { describe, expect, it, vi, afterEach } from "vitest";
-import { getLeetCodeUserData } from "@/lib/leetcode/client";
+import {
+  getLeetCodeCalendarData,
+  getLeetCodeContestData,
+  getLeetCodeLanguageData,
+  getLeetCodeSkillData,
+  getLeetCodeUserData,
+} from "@/lib/leetcode/client";
 import { LeetCodeAppError } from "@/lib/leetcode/errors";
 
 afterEach(() => {
@@ -42,6 +48,57 @@ describe("LeetCode GraphQL client", () => {
     });
 
     await expect(getLeetCodeUserData("alice")).rejects.toMatchObject({
+      code: "UPSTREAM_ERROR",
+      status: 502,
+    });
+  });
+
+  it("maps malformed P1 GraphQL data to UPSTREAM_ERROR", async () => {
+    mockFetchResponse({
+      data: {
+        matchedUser: {
+          username: "alice",
+        },
+      },
+    });
+    await expect(getLeetCodeLanguageData("alice")).rejects.toMatchObject({
+      code: "UPSTREAM_ERROR",
+      status: 502,
+    });
+
+    mockFetchResponse({
+      data: {
+        matchedUser: {
+          username: "alice",
+        },
+      },
+    });
+    await expect(getLeetCodeSkillData("alice")).rejects.toMatchObject({
+      code: "UPSTREAM_ERROR",
+      status: 502,
+    });
+
+    mockFetchResponse({
+      data: {
+        matchedUser: {
+          username: "alice",
+        },
+      },
+    });
+    await expect(getLeetCodeCalendarData("alice", 2026)).rejects.toMatchObject({
+      code: "UPSTREAM_ERROR",
+      status: 502,
+    });
+
+    mockFetchResponse({
+      data: {
+        matchedUser: {
+          username: "alice",
+        },
+        userContestRankingHistory: "invalid",
+      },
+    });
+    await expect(getLeetCodeContestData("alice")).rejects.toMatchObject({
       code: "UPSTREAM_ERROR",
       status: 502,
     });

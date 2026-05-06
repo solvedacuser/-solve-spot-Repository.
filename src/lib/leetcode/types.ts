@@ -99,3 +99,77 @@ export interface LeetCodeAcceptedSubmission {
   titleSlug: string;
   timestamp: string;
 }
+
+export interface LeetCodeLanguageStat {
+  languageName: string;
+  problemsSolved: number;
+}
+
+export interface LeetCodeLanguageResponse {
+  username: string;
+  languages: LeetCodeLanguageStat[];
+}
+
+export interface LeetCodeSkillStat {
+  tagName: string;
+  tagSlug: string;
+  problemsSolved: number;
+}
+
+export interface LeetCodeSkillResponse {
+  username: string;
+  groups: {
+    fundamental: LeetCodeSkillStat[];
+    intermediate: LeetCodeSkillStat[];
+    advanced: LeetCodeSkillStat[];
+  };
+}
+
+export interface LeetCodeCalendarBadge {
+  timestamp: string;
+  badge: {
+    name: string;
+    icon: string;
+  };
+}
+
+export interface LeetCodeCalendarResponse {
+  username: string;
+  year: number;
+  activeYears: number[];
+  streak: number;
+  totalActiveDays: number;
+  submissionCalendar: Record<string, number>;
+  dccBadges: LeetCodeCalendarBadge[];
+}
+
+export interface LeetCodeContestRanking {
+  attendedContestsCount: number;
+  rating: number;
+  globalRanking: number;
+  totalParticipants: number;
+  topPercentage: number;
+  badge: {
+    name: string;
+  } | null;
+}
+
+export interface LeetCodeContestHistoryItem {
+  attended: boolean;
+  trendDirection: string;
+  problemsSolved: number;
+  totalProblems: number;
+  finishTimeInSeconds: number;
+  rating: number;
+  ranking: number;
+  contest: {
+    title: string;
+    startTime: number;
+  };
+}
+
+export interface LeetCodeContestResponse {
+  username: string;
+  ranking: LeetCodeContestRanking | null;
+  history: LeetCodeContestHistoryItem[];
+}

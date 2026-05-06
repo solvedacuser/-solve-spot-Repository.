@@ -20,7 +20,7 @@ export default async function LeetCodeApiPage() {
           </h1>
           <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
             This page verifies the local `/api/leetcode/*` route handlers for public username lookup, bio lookup,
-            problem recommendation, and recent accepted solved checks.
+            profile extension stats, problem recommendation, and recent accepted solved checks.
           </p>
 
           <div className="mt-5 flex flex-wrap gap-3 text-sm text-slate-600">

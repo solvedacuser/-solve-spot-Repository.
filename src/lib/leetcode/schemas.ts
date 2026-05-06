@@ -38,6 +38,24 @@ export const recentAcceptedLimitSchema = z
   .max(100, "recentAcceptedLimit must be at most 100.")
   .default(100);
 
+export const calendarYearSchema = z.preprocess(
+  (value) => {
+    if (typeof value === "string") {
+      const trimmed = value.trim();
+      return trimmed === "" ? value : Number(trimmed);
+    }
+
+    return value;
+  },
+  z
+    .number({
+      invalid_type_error: "year must be a number.",
+    })
+    .int("year must be an integer.")
+    .min(2008, "year must be at least 2008.")
+    .max(2100, "year must be at most 2100."),
+);
+
 export const recommendLeetCodeProblemsRequestSchema = z.object({
   usernames: z.array(usernameSchema).default([]),
   count: z
@@ -154,6 +172,137 @@ export const leetCodeProblemsetGraphQLDataSchema = z
   })
   .passthrough();
 
+const languageStatSchema = z
+  .object({
+    languageName: z.string(),
+    problemsSolved: z.number().int().nonnegative(),
+  })
+  .passthrough();
+
+export const leetCodeLanguageGraphQLDataSchema = z
+  .object({
+    matchedUser: z
+      .object({
+        username: z.string(),
+        languageProblemCount: z.array(languageStatSchema),
+      })
+      .passthrough()
+      .nullable()
+      .optional(),
+  })
+  .passthrough();
+
+const skillStatSchema = z
+  .object({
+    tagName: z.string(),
+    tagSlug: tagSlugSchema,
+    problemsSolved: z.number().int().nonnegative(),
+  })
+  .passthrough();
+
+export const leetCodeSkillGraphQLDataSchema = z
+  .object({
+    matchedUser: z
+      .object({
+        username: z.string(),
+        tagProblemCounts: z.object({
+          fundamental: z.array(skillStatSchema),
+          intermediate: z.array(skillStatSchema),
+          advanced: z.array(skillStatSchema),
+        }),
+      })
+      .passthrough()
+      .nullable()
+      .optional(),
+  })
+  .passthrough();
+
+const calendarBadgeSchema = z
+  .object({
+    timestamp: z.union([z.string(), z.number()]).transform(String),
+    badge: z
+      .object({
+        name: z.string(),
+        icon: z.string().nullable().transform((value) => value ?? ""),
+      })
+      .passthrough(),
+  })
+  .passthrough();
+
+export const leetCodeCalendarGraphQLDataSchema = z
+  .object({
+    matchedUser: z
+      .object({
+        username: z.string(),
+        userCalendar: z
+          .object({
+            activeYears: z.array(z.number().int()),
+            streak: z.number().int().nonnegative(),
+            totalActiveDays: z.number().int().nonnegative(),
+            dccBadges: z.array(calendarBadgeSchema),
+            submissionCalendar: z.string(),
+          })
+          .passthrough(),
+      })
+      .passthrough()
+      .nullable()
+      .optional(),
+  })
+  .passthrough();
+
+const contestBadgeSchema = z
+  .object({
+    name: z.string(),
+  })
+  .passthrough();
+
+const contestRankingSchema = z
+  .object({
+    attendedContestsCount: z.number().int().nonnegative(),
+    rating: z.number().nonnegative(),
+    globalRanking: z.number().int().nonnegative(),
+    totalParticipants: z.number().int().nonnegative(),
+    topPercentage: z.number().nonnegative(),
+    badge: contestBadgeSchema.nullable().default(null),
+  })
+  .passthrough();
+
+const contestHistoryItemSchema = z
+  .object({
+    attended: z.boolean(),
+    trendDirection: z.string(),
+    problemsSolved: z.number().int().nonnegative(),
+    totalProblems: z.number().int().nonnegative(),
+    finishTimeInSeconds: z.number().int().nonnegative(),
+    rating: z.number().nonnegative(),
+    ranking: z.number().int().nonnegative(),
+    contest: z
+      .object({
+        title: z.string(),
+        startTime: z.number().int().nonnegative(),
+      })
+      .passthrough(),
+  })
+  .passthrough();
+
+export const leetCodeContestGraphQLDataSchema = z
+  .object({
+    matchedUser: z
+      .object({
+        username: z.string(),
+      })
+      .passthrough()
+      .nullable()
+      .optional(),
+    userContestRanking: contestRankingSchema.nullable().optional(),
+    userContestRankingHistory: z.array(contestHistoryItemSchema),
+  })
+  .passthrough();
+
 export type LeetCodeUserGraphQLData = z.infer<typeof leetCodeUserGraphQLDataSchema>;
 export type LeetCodeRecentAcceptedGraphQLData = z.infer<typeof leetCodeRecentAcceptedGraphQLDataSchema>;
 export type LeetCodeProblemsetGraphQLData = z.infer<typeof leetCodeProblemsetGraphQLDataSchema>;
+export type LeetCodeLanguageGraphQLData = z.infer<typeof leetCodeLanguageGraphQLDataSchema>;
+export type LeetCodeSkillGraphQLData = z.infer<typeof leetCodeSkillGraphQLDataSchema>;
+export type LeetCodeCalendarGraphQLData = z.infer<typeof leetCodeCalendarGraphQLDataSchema>;
+export type LeetCodeContestGraphQLData = z.infer<typeof leetCodeContestGraphQLDataSchema>;
