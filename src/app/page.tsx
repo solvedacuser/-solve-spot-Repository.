@@ -2,11 +2,55 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { PlatformInfo, PlatformLogo } from "@/components/platformLogo";
-import Footer from "@/components/footer";
-import Card from "@/components/card";
-import ActiveContent from "@/components/content";
-import { ActiveCardType } from "@/components/content";
+
+type ActiveCardType = "teamStudy" | "recommend" | "share" | "chart";
+
+function Card({
+  imgSrcPath,
+  title,
+  description,
+}: {
+  imgSrcPath: string;
+  title: string;
+  description: string;
+}) {
+  return (
+    <div>
+      <div className="flex flex-col w-[370px] md:w-[450px] h-auto bg-white/50 border border-[#f0f0f0] rounded-lg shadow-lg items-center hover:scale-105 hover:brightness-100">
+        <div className="flex flex-row items-center w-full px-5 pt-7 pb-2 gap-3 my-3 text-[#333388]">
+          <img src={imgSrcPath} alt="icon_teamPlay" className="w-12 h-12" />
+          <span className="text-2xl">
+            <b>{title}</b>
+          </span>
+        </div>
+        <div className="flex flex-row items-center w-full p-5 text-xl text-[#555588]">
+          <p>{description}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ActiveContent({ activeCard }: { activeCard: ActiveCardType }) {
+  const activeContent = {
+    teamStudy: <img src="/example.png" />,
+    recommend: <img src="/example.png" />,
+    share: <img src="/example.png" />,
+    chart: <img src="/example.png" />,
+  };
+
+  return (
+    <div className="w-[80%] h-fit mx-auto p-10 md:p-10 bg-white/50 rounded-3xl shadow mb-20 text-center">
+      <span className="text-2xl">{activeCard}</span>
+      {activeContent[activeCard]}
+    </div>
+  );
+}
+
+const PlatformInfo = {
+  name: "Solve Spot",
+  logoSrc: "/waypoints.svg",
+};
 
 export default function HomePage() {
   const [activeCard, setActiveCard] = useState<ActiveCardType>("teamStudy");
@@ -26,15 +70,14 @@ export default function HomePage() {
             함께 성장하는 길에 참여하세요.
           </p>
           <Link
-            className="flex w-fit h-fit bg-white-50 text-2xl tracking-tight justify-center items-center
+            className="flex w-fit h-fit bg-white text-2xl tracking-tight justify-center items-center
           text-black-50 font-bold p-4 shadow-lg border-[1.1px] rounded-3xl cursor-pointer hover:scale-105 hover:shadow-xl trasition-transform duraiton-1000"
             href="./login"
           >
             지금 바로 시작하기
           </Link>
         </section>
-
-        <section className="w-full h-[100rem] text-black backdrop-blur-sm">
+        <section className="w-full h-[100rem] text-black backdrop-blur-sm my-10">
           <div className="grid grid-cols-1 md:grid-cols-2 w-fit gap-[50px] mx-auto px-10 py-20">
             <button onClick={() => setActiveCard("teamStudy")}>
               <Card
@@ -68,7 +111,6 @@ export default function HomePage() {
           <ActiveContent activeCard={activeCard} />
         </section>
       </main>
-      <Footer />
     </>
   );
 }
