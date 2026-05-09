@@ -12,8 +12,8 @@ CodeMate의 Next.js App Router 기반 초안 프로젝트입니다. 현재는 so
 - Node.js 22.x
 - npm 10+
 - 인증 및 데이터 기능 확장을 위한 Supabase 프로젝트
-- css 
-- tailwind 버전 명세
+- CSS3
+- Tailwind CSS 3.4.17
 
 ## 환경 변수
 `.env.example`을 `.env.local`로 복사한 뒤 실제 값을 채워서 사용합니다.
