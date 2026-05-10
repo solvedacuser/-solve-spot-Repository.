@@ -3,7 +3,7 @@ import { IBM_Plex_Mono, Space_Grotesk } from "next/font/google";
 import { SiteNav } from "@/components/site-nav";
 import { createClient } from "@/utils/supabase/server";
 import "./globals.css";
-
+import { Toaster } from "@/components/ui/toaster"
 const headingFont = Space_Grotesk({
   subsets: ["latin"],
   variable: "--font-heading",
@@ -40,6 +40,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
           displayName={profile?.display_name}
         />
         {children}
+        <Toaster />
       </body>
     </html>
   );
