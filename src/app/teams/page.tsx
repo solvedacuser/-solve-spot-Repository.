@@ -36,6 +36,7 @@ import Link from "next/link"
 import { useEffect, useReducer, useState } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/utils/supabase/client"
+import { Session } from "@supabase/supabase-js";
 
 
   export default function page(){
@@ -44,20 +45,32 @@ import { createClient } from "@/utils/supabase/client"
     const [coworker, setCoworker] = useState("")
     const [teams, setTeam] = useState<any[] | null>([])
     const [member, setMember] = useState<any[]>([])
-    const supabase = createClient()
+    const [isOpen, setIsOpen] = useState(false)
+    const [session, setSession] = useState<Session | null>(null)
+    const [supabase] = useState(() => createClient()) 
     const { toast } = useToast()
     const router = useRouter()
+    useEffect(() => {
+        const getSession = async() => {
+            const {data} = await supabase.auth.getSession()
+            setSession(data.session)
+            console.log(data.session?.user.user_metadata.boj_handle)
+        }
+        getSession()
+    },[])
     useEffect(() => {
         const getTeam = async() => {
         let { data: team, error } = await supabase
         .from('team')
         .select('*')
         setTeam(team)
+        console.log("teams", team)
+        console.log("team error " ,error)
         }
         getTeam()
     },[])
-    console.log(teams)
-
+    
+    console.log("session", session)
     const getUsers = async () => {
         let { data: team, error } = await supabase
         .from('team')
@@ -101,10 +114,16 @@ import { createClient } from "@/utils/supabase/client"
         const { data, error } = await supabase
         .from('team')
         .insert([
-            { teamName: name, description: username, teamLeader: "Session Mapping",  UserList: member, isActivated : 1}
+            { teamName: name, description: username, teamLeader: session?.user.user_metadata.boj_handle,  UserList: member, isActivated : 1}
         ])
         .select()
-        router.push("/teams")
+
+        setIsOpen(false)
+        if(data == null){
+            return
+        }
+        router.push(`/team/${data[0].rid}`)
+        router.refresh()
         
 
             
@@ -115,10 +134,20 @@ import { createClient } from "@/utils/supabase/client"
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
             <div className="flex">
                 
-                    <Dialog>
-                <DialogTrigger asChild>
-                <Button className="mt-5 ml-auto" variant="outline">+ 팀 추가하기</Button>
-                </DialogTrigger>
+                <Dialog open={isOpen} onOpenChange={(open) => {
+                    
+                    setIsOpen(open); 
+                    if(!open) setMember([])
+                    }}>
+                
+                <Button className="mt-5 ml-auto" variant="outline" onClick={(e) => {
+                    if(!session){
+                        router.push("/login")
+                        return
+                    }
+                    setIsOpen(true)
+                }}>+ 팀 추가하기</Button>
+                
         
        
         
@@ -211,7 +240,7 @@ import { createClient } from "@/utils/supabase/client"
                                     </div>
                                     <div className="flex items-center gap-[5px] px-[10px] py-1 rounded-md bg-slate-50 border border-gray-200 text-[11px] text-gray-500 font-medium">
                                         <i className="fa-solid fa-user-group text-gray-400"/>
-                                        {elem.UserList.length}명
+                                        {elem.UserList.length+1}명
                                     </div>
                                     <div className="flex items-center gap-[5px] px-[10px] py-1 rounded-md bg-slate-50 border border-gray-200 text-[11px] text-gray-500 font-medium">
                                         <i className="fa-regular fa-calendar text-gray-400" />
@@ -226,7 +255,7 @@ import { createClient } from "@/utils/supabase/client"
                                             <div className="">
                                                 <div className="text-[12px] font-bold">
                                                 <i className="fa-solid fa-crown text-amber-500 text-[9px] mr-1" />
-                                                @Kim_BaekJun
+                                                @{elem.teamLeader}
                                                 </div>
                                                 <div className="text-[10px] text-gray-400 mt-[1px]">팀장</div>
                                             </div>
