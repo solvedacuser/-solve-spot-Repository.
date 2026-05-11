@@ -136,3 +136,4 @@ for update
 to authenticated
 using ((select auth.uid()) is not null and (select auth.uid()) = id)
 with check ((select auth.uid()) is not null and (select auth.uid()) = id);
+
