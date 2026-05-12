@@ -41,6 +41,9 @@ export function SiteNav({ isAuthenticated, userEmail, displayName }: SiteNavProp
               <Link href="/leetcode-api" className={navLinkClass(pathname === "/leetcode-api")}>
                 LeetCode API
               </Link>
+              <Link href="/teams" className={navLinkClass(pathname === "/teams")}>
+                Teams
+              </Link>
             </nav>
           </div>
 

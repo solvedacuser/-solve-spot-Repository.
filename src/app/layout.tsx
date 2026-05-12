@@ -3,6 +3,8 @@ import { IBM_Plex_Mono, Space_Grotesk } from "next/font/google";
 import { SiteNav } from "@/components/site-nav";
 import { createClient } from "@/utils/supabase/server";
 import "./globals.css";
+
+import { Toaster } from "@/components/ui/toaster"
 import Footer from "@/components/footer";
 
 const headingFont = Space_Grotesk({
@@ -48,7 +50,10 @@ export default async function RootLayout({
           displayName={profile?.display_name}
         />
         {children}
+        
+        <Toaster />
         <Footer />
+
       </body>
     </html>
   );
