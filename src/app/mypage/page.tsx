@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { createClient } from "@/utils/supabase/server";
 import {
   Card,
@@ -8,9 +7,6 @@ import {
   // ProfileCard,
   LineChart,
 } from "./charts";
-import { The_Nautigal } from "next/font/google";
-import { date, number } from "zod/v4";
-import { recordTraceEvents } from "next/dist/trace";
 import { LuChartColumn } from "react-icons/lu";
 import { RiDonutChartLine } from "react-icons/ri";
 import { FiTrendingUp } from "react-icons/fi";
@@ -26,93 +22,6 @@ function getDatefor7days() {
   }
   return dateDaysAgo;
 }
-
-// async function getDailySolvedLast7days(username: string, limit: number) {
-//   const res = await fetch("https://leetcode.com/graphql", {
-//     method: "POST",
-//     headers: {
-//       "Content-Type": "application/json",
-//     },
-//     body: JSON.stringify({
-//       query: `
-//         query userRecentAcSubmissions($username: String!, $limit: Int!) {
-//           recentAcSubmissionList(username: $username, limit: $limit) {
-//             id
-//             title
-//             titleSlug
-//             timestamp
-//           }
-//         }
-//       `,
-//       variables: {
-//         username: username,
-//         limit: limit,
-//       },
-//     }),
-//   });
-//   const payload = await res.json();
-//   const recentAcSubmissionList = payload.data.recentAcSubmissionList;
-//   console.log(recentAcSubmissionList);
-
-//   const supabase = await createClient();
-//   const {
-//     data: { user },
-//   } = await supabase.auth.getUser();
-
-//   const { data: record, error } = user
-//     ? await supabase
-//         .from("profiles")
-//         .select("created_at")
-//         .eq("id", user.id)
-//         .maybeSingle()
-//     : { data: null };
-//   console.log(record);
-
-//   // 가입 후 해결한 문제 목록 만들기
-
-//   // const test = 1778667603; 테스트 완료
-//   const validAcSubmissionList = recentAcSubmissionList.filter((submission) => {
-//     if (
-//       submission.timestamp >=
-//       Math.floor(new Date(record?.created_at).getTime() / 1000)
-//     ) {
-//       return submission;
-//     }
-//   });
-//   console.log(validAcSubmissionList);
-
-//   // 유효한 문제들 중 7일 이내의 문제들
-//   const todayStart = new Date();
-//   todayStart.setDate(todayStart.getDate() - 6);
-//   todayStart.setHours(0, 0, 0, 0);
-//   const sevenDaysAgo = new Date(todayStart);
-//   console.log(sevenDaysAgo.getTime());
-//   const startTimestamp = Math.floor(sevenDaysAgo.getTime() / 1000);
-//   console.log(startTimestamp);
-
-//   const AcSubmissionListLast7days = validAcSubmissionList.filter(
-//     (submission) => {
-//       submission.timestamp > startTimestamp;
-//       console.log(submission.timestamp);
-//       return submission;
-//     },
-//   );
-//   console.log("List is", AcSubmissionListLast7days, "what");
-
-//   const numAcSubmissionLast7days = AcSubmissionListLast7days.length;
-//   console.log(AcSubmissionListLast7days);
-//   return AcSubmissionListLast7days;
-// }
-
-// async function updateSolvedDifficulty(username: string) {
-//   const res = await fetch(
-//     `http://localhost:3000/api/leetcode/user?username=${encodeURIComponent(username.trim())}`,
-//   );
-//   const data = await res.json();
-//   const solvedDifficulty = data.solved;
-//   console.log(solvedDifficulty);
-//   return solvedDifficulty;
-// }
 async function getStreak(username: string, year: string): Promise<number> {
   const res = await fetch(
     `http://localhost:3000/api/leetcode/calendar?username=${encodeURIComponent(username.trim())}&year=${encodeURIComponent(year.trim())}`,
@@ -144,8 +53,6 @@ export default async function MyPage() {
   if (!record) {
     console.log("데이터: null");
   }
-
-  // console.log(record);
   const username: string = record?.username;
   const year: number = new Date().getFullYear();
   const totalTeams: number = record?.totalTeams || 0;
@@ -156,47 +63,8 @@ export default async function MyPage() {
   const numSolvedHard: number = record?.num_solved_hard || 0;
   const totalSolved: number = numSolvedEasy + numSolvedMedium + numSolvedHard;
   const numSolvedMonthly: number[] = record?.num_solved_monthly;
-  //  || [
-  //   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-  // ];
   const annualActivity = record?.annual_activity;
-  //  || [
-  //   { date: 1779615957000, count: 0 },
-  //   { date: "2026-01-05", count: 0 },
-  //   { date: "2026-01-05", count: 0 },
-  //   { date: "2026-01-07", count: 0 },
-  //   { date: "2026-01-06", count: 0 },
-  //   { date: "2026-01-09", count: 0 },
-  //   { date: "2026-01-01", count: 0 },
-  // ];
   const EachDateLast7days: Date[] = getDatefor7days();
-
-  // const numSolvedDailyLast7days = record?.dail;
-  // const activityAYeardata = record?.activityayear;
-  // const numTeamsSolved = record?.teamsinvolved || null;
-  // const teamsName = numTeamsSolved.map((team) => team.name);
-  // const teamsCount = numTeamsSolved.map((team) => team.count);
-  // // const solvedDifficulty = await updateSolvedDifficulty(username);
-  // const recentAcSubmissionList = await updateDailySolvedLast7days(
-  //   username,
-  //   100,
-  // );
-  // console.log("streak is" + streak);
-  // console.log("total is" + solvedDifficulty.total);
-  // console.log("total is" + solvedEasy);
-  // console.log("total is" + solvedMedium);
-  // console.log("total is" + solvedHard);
-  // console.log("submission is " + recentAcSubmissionList);
-
-  // const { data: profilesLC } = user
-  //   ? await supabase
-  //       .from("profiles_leetcode")
-  //       .select("*")
-  //       .eq("id", user.id)
-  //       .maybeSingle()
-  //   : { data: null };
-  // const profilesLeetcode = profilesLC;
-  // console.log(profilesLeetcode);
 
   const labelsDate = EachDateLast7days.map((date) => {
     const lMonth = date.getMonth() + 1;
@@ -205,26 +73,6 @@ export default async function MyPage() {
     return formattedDate;
   });
 
-  // let numSolvedEachDayLast7days = [0, 0, 0, 0, 0, 0, 0];
-  // recentAcSubmissionList.forEach((submission) => {
-  //   const date = new Date(submission.timestamp * 1000);
-  //   for (let i = 6; 0 <= i; i--) {
-  //     if (
-  //       date.getDate() == EachDateLast7days[i].getDate() &&
-  //       date.getMonth() == EachDateLast7days[i].getMonth()
-  //     ) {
-  //       numSolvedEachDayLast7days[i]++;
-  //     }
-  //   }
-  // });
-
-  // console.log(numSolvedEachDayLast7days);
-  // console.log(solvedDifficulty.easy);
-  // console.log(solvedDifficulty.medium);
-  // console.log(solvedDifficulty.hard);
-  // console.log("1. " + totalSolved);
-  // console.log("2. " + totalTeams);
-  // console.log("3. " + streak);
   return (
     <div className="flex flex-col items-center mt-16 mb-28">
       <div className="w-[80%] mx-auto">
@@ -328,25 +176,6 @@ export default async function MyPage() {
           </div>
         </div>
       </div>
-      {/* <div className="relative w-[75%] h-auto my-5 bg-white p-5 border-2 border-gray rounded-lg">
-        <div className="relative pb-12 text-base md:text-2xl">
-          <span>
-            <b>팀별 나의 기여도</b>
-          </span>
-          <Link
-            href="/teamlist"
-            className="absolute right-0 bg-white text-lg drop-shadow rounded-lg p-1.5 hover:"
-          >
-            참여 팀 →
-          </Link>
-        </div> */}
-      {/* <BarChart
-          labels={teamsName}
-          labelTitle="팀별 해결한 문제 수"
-          data={teamsCount}
-          chartTitle="팀별 내가 해결한 문제 수"
-        ></BarChart> */}
-      {/* </div> */}
     </div>
   );
 }

@@ -101,16 +101,7 @@ export function BarChart({
             {
               label: labelTitle,
               data: data,
-              backgroundColor: [
-                // "rgba(255, 99, 132, 0.5)",
-                // "rgba(155, 255, 132, 0.5)",
-                // "rgba(55, 99, 255, 0.5)",
-                // "rgba(27, 45, 61, 0.5)",
-                // "rgba(123, 0, 123, 0.5)",
-                // "rgba(0, 200, 200, 0.5)",
-                // "rgba(150, 20, 150, 0.5)",
-                "rgba(59, 130, 246, 0.8)",
-              ],
+              backgroundColor: ["rgba(59, 130, 246, 0.8)"],
               hoverBackgroundColor: "rgb(9, 83, 201)",
               borderRadius: 20,
               barPercentage: 0.6,
@@ -267,13 +258,8 @@ interface activityDataProps {
 }
 
 export function Calendar({ year, activityData }: activityDataProps) {
-  // const todayDate = new Date();
-  // const startDate = new Date(todayDate.getFullYear() - 1 + "-12-31");
-  // const endDate = new Date(todayDate.getFullYear() + "-12-31");
-
   const startDate = new Date(year - 1 + "-12-31");
   const endDate = new Date(year + "-12-31");
-  // const dateLabel = activityData.map((item) => new Date(item.date).getDate());
 
   return (
     <div className="w-full">
@@ -327,63 +313,3 @@ export function Calendar({ year, activityData }: activityDataProps) {
     </div>
   );
 }
-
-// export function ProfileCard({ profileData }) {
-//   const username = profileData?.username;
-//   const rank = profileData?.rank;
-//   const easysolved = profileData?.easysolved;
-//   const mediumsolved = profileData?.mediumsolved;
-//   const hardsolved = profileData?.hardsolved;
-//   const skillfundamental = profileData?.skillstats.fundamental || null;
-//   const skillintermediate = profileData?.skillstats.intermediate || null;
-//   const skilladvanced = profileData?.skillstats.advanced || null;
-
-//   console.(skilladvanced?.map((item) => item.problemsSolved));
-//   return (
-//     <div className="w-auto border-2 border-gray rounded-lg bg-white text-black px-2">
-//       <div className="text-base md:text-xl px-4 md:px-5 pt-2 md:pt-3">
-//         <span>{username}의 정보</span>
-//       </div>
-//       <div className="text-lg md:text-2xl px-4 md:px-5 py-2 md:py-3">
-//         <span>rank: {rank}</span> <br />
-//         <span>Easy: {easysolved}</span> <br />
-//         <span>Medium: {mediumsolved}</span> <br />
-//         <span>Hard: {hardsolved}</span> <br />
-//         <span>skill stats</span> <br />
-//         <span>
-//           Fundamental:
-//           <ul>
-//             {skillfundamental?.map((item) => (
-//               <li>
-//                 {item.tagName} {item.problemsSolved}
-//               </li>
-//             ))}
-//           </ul>
-//         </span>
-//         <span>
-//           Intermediate:
-//           <ul>
-//             {skillintermediate?.map((item) => (
-//               <li>
-//                 {item.tagName} {item.problemsSolved}
-//               </li>
-//             ))}
-//           </ul>
-//         </span>
-//         <span>
-//           Advanced:
-//           <ul>
-//             {skilladvanced?.map((item) => (
-//               <li>
-//                 <span>
-//                   {item.tagName}
-//                   {item.problemsSolved ? item.problemsSolved : undefined}
-//                 </span>
-//               </li>
-//             ))}
-//           </ul>
-//         </span>
-//       </div>
-//     </div>
-//   );
-// }
