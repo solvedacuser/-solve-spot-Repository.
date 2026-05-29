@@ -98,9 +98,11 @@ function getMetadataValue(user: User, key: string) {
 function getAuthorName(profile: ProfileRow | undefined, user: User | null) {
   return (
     profile?.display_name?.trim() ||
+    profile?.leetcode_username?.trim() ||
     profile?.boj_handle?.trim() ||
     (user ? getMetadataValue(user, "display_name") : null) ||
     (user ? getMetadataValue(user, "name") : null) ||
+    (user ? getMetadataValue(user, "leetcode_username") : null) ||
     (user ? getMetadataValue(user, "boj_handle") : null) ||
     user?.email ||
     "Unknown user"
@@ -313,15 +315,15 @@ export async function createRecordTeam(
   const user = await getAuthenticatedUser(supabase);
   const parsedInput: CreateRecordTeamRequest = createRecordTeamRequestSchema.parse(input);
   const profile = await getCurrentProfile(supabase, user.id);
-  const leaderHandle = profile?.boj_handle?.trim();
+  const leaderUsername = profile?.leetcode_username?.trim() || getMetadataValue(user, "leetcode_username");
 
-  if (!leaderHandle) {
-    throw new RecordAppError("BAD_REQUEST", 400, "Set your BOJ handle before creating a team.");
+  if (!leaderUsername) {
+    throw new RecordAppError("BAD_REQUEST", 400, "Set your LeetCode username before creating a team.");
   }
 
   const legacyUserList = toLegacyUserList(parsedInput.invitedUsers);
   const team = assertRepositoryResult(
-    await createTeamRow(supabase, parsedInput, leaderHandle, legacyUserList),
+    await createTeamRow(supabase, parsedInput, leaderUsername, legacyUserList),
     "Failed to create the team.",
   );
 

@@ -408,7 +408,7 @@ export async function listProfilesByIds(
 
   const { data, error } = await supabase
     .from("profiles")
-    .select("id, display_name, boj_handle")
+    .select("id, display_name, leetcode_username, boj_handle")
     .in("id", uniqueIds);
 
   return {
@@ -488,13 +488,13 @@ export async function checkRecordTeamMembership(
 export async function createTeamRow(
   supabase: RecordSupabaseClient,
   input: CreateRecordTeamRequest,
-  leaderHandle: string,
+  leaderUsername: string,
   legacyUserList: string[],
 ): Promise<RepositoryResult<CreatedTeamRow | null>> {
   const insertRow: InsertTeamRow = {
-    teamName: input.teamName,
+    teamName: input.name,
     description: toNullableText(input.description),
-    teamLeader: leaderHandle,
+    teamLeader: leaderUsername,
     UserList: legacyUserList,
     isActivated: 1,
   };

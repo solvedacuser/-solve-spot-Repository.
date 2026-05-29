@@ -64,7 +64,7 @@ describe("record teams route", () => {
       new NextRequest("http://localhost/api/record/teams", {
         method: "POST",
         body: JSON.stringify({
-          teamName: "Algorithms",
+          name: "Algorithms",
           description: "Practice together",
           invitedUsers: [],
         }),
@@ -75,7 +75,7 @@ describe("record teams route", () => {
     expect(response.status).toBe(201);
     expect(payload).toEqual({ id: 123, name: "Algorithms" });
     expect(createRecordTeam).toHaveBeenCalledWith(expect.anything(), {
-      teamName: "Algorithms",
+      name: "Algorithms",
       description: "Practice together",
       invitedUsers: [],
     });

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { listRecordsQuerySchema } from "@/lib/record/schemas";
+import { createRecordTeamRequestSchema, listRecordsQuerySchema } from "@/lib/record/schemas";
 
 describe("record schemas", () => {
   it("defaults record list scope to mine", () => {
@@ -50,5 +50,10 @@ describe("record schemas", () => {
         to: "2026-05-01",
       }),
     ).toThrow();
+  });
+
+  it("normalizes record team creation naming", () => {
+    expect(createRecordTeamRequestSchema.parse({ name: "Algorithms" }).name).toBe("Algorithms");
+    expect(createRecordTeamRequestSchema.parse({ teamName: "Algorithms" }).name).toBe("Algorithms");
   });
 });

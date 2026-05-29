@@ -224,7 +224,7 @@ describe("record service", () => {
   it("creates a team and normalized memberships", async () => {
     const invitedUserId = "44444444-4444-4444-8444-444444444444";
     vi.mocked(repository.listProfilesByIds).mockResolvedValue({
-      data: [{ id: user.id, display_name: "Alice", boj_handle: "alice" }],
+      data: [{ id: user.id, display_name: "Alice", leetcode_username: "alice-lc", boj_handle: "alice" }],
       error: null,
     });
     vi.mocked(repository.createTeamRow).mockResolvedValue({
@@ -237,7 +237,7 @@ describe("record service", () => {
     });
 
     const result = await createRecordTeam(createSupabase(), {
-      teamName: "Algorithms",
+      name: "Algorithms",
       description: "Practice together",
       invitedUsers: [{ user_id: invitedUserId }],
     });
@@ -245,8 +245,8 @@ describe("record service", () => {
     expect(result).toEqual({ id: 123, name: "Algorithms" });
     expect(repository.createTeamRow).toHaveBeenCalledWith(
       expect.anything(),
-      expect.objectContaining({ teamName: "Algorithms" }),
-      "alice",
+      expect.objectContaining({ name: "Algorithms" }),
+      "alice-lc",
       [JSON.stringify({ user_id: invitedUserId })],
     );
     expect(repository.createTeamMembershipRow).toHaveBeenNthCalledWith(
@@ -265,15 +265,15 @@ describe("record service", () => {
     );
   });
 
-  it("rejects team creation without a BOJ handle profile", async () => {
+  it("rejects team creation without a LeetCode username profile", async () => {
     vi.mocked(repository.listProfilesByIds).mockResolvedValue({
-      data: [{ id: user.id, display_name: "Alice", boj_handle: null }],
+      data: [{ id: user.id, display_name: "Alice", leetcode_username: null, boj_handle: "alice" }],
       error: null,
     });
 
     await expect(
       createRecordTeam(createSupabase(), {
-        teamName: "Algorithms",
+        name: "Algorithms",
         invitedUsers: [],
       }),
     ).rejects.toMatchObject({
