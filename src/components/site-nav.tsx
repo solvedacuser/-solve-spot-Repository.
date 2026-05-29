@@ -22,6 +22,7 @@ function navLinkClass(isActive: boolean) {
 export function SiteNav({ isAuthenticated, userEmail, displayName }: SiteNavProps) {
   const pathname = usePathname();
   const identityLabel = displayName || userEmail || "account";
+  const isRecordActive = pathname.startsWith("/record");
 
   return (
     <header className="sticky top-0 z-40 px-4 pt-4 sm:px-6 lg:px-8">
@@ -35,11 +36,17 @@ export function SiteNav({ isAuthenticated, userEmail, displayName }: SiteNavProp
               <Link href="/" className={navLinkClass(pathname === "/")}>
                 Home
               </Link>
+              <Link href="/record" className={navLinkClass(isRecordActive)}>
+                Records
+              </Link>
               <Link href="/api-check" className={navLinkClass(pathname === "/api-check")}>
                 API Check
               </Link>
               <Link href="/leetcode-api" className={navLinkClass(pathname === "/leetcode-api")}>
                 LeetCode API
+              </Link>
+              <Link href="/teams" className={navLinkClass(pathname === "/teams")}>
+                Teams
               </Link>
             </nav>
           </div>

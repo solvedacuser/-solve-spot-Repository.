@@ -1,6 +1,9 @@
 import { z } from "zod";
+import { usernameSchema as leetCodeUsernameSchema } from "@/lib/leetcode/schemas";
 
-export type AuthFieldErrors = Partial<Record<"email" | "password" | "displayName" | "bojHandle", string>>;
+export type AuthFieldErrors = Partial<
+  Record<"email" | "password" | "displayName" | "leetcodeUsername" | "bojHandle", string>
+>;
 
 export type AuthActionState = {
   status: "idle" | "success" | "error";
@@ -47,10 +50,23 @@ const optionalBojHandleSchema = z.preprocess(
     .optional(),
 );
 
+const optionalLeetCodeUsernameSchema = z.preprocess(
+  (value) => {
+    if (typeof value !== "string") {
+      return value;
+    }
+
+    const trimmed = value.trim();
+    return trimmed === "" ? undefined : trimmed;
+  },
+  leetCodeUsernameSchema.optional(),
+);
+
 export const signupSchema = z.object({
   email: emailSchema,
   password: passwordSchema,
   displayName: displayNameSchema,
+  leetcodeUsername: optionalLeetCodeUsernameSchema,
   bojHandle: optionalBojHandleSchema,
 });
 
@@ -61,18 +77,25 @@ export const loginSchema = z.object({
 
 export const profileSchema = z.object({
   displayName: displayNameSchema,
+  leetcodeUsername: optionalLeetCodeUsernameSchema,
   bojHandle: optionalBojHandleSchema,
 });
 
 export function getFieldErrors(error: z.ZodError): AuthFieldErrors {
   const flattened = error.flatten().fieldErrors;
 
-  return {
+  const fieldErrors: AuthFieldErrors = {
     email: flattened.email?.[0],
     password: flattened.password?.[0],
     displayName: flattened.displayName?.[0],
     bojHandle: flattened.bojHandle?.[0],
   };
+
+  if (flattened.leetcodeUsername?.[0]) {
+    fieldErrors.leetcodeUsername = flattened.leetcodeUsername[0];
+  }
+
+  return fieldErrors;
 }
 
 type AuthContext = "signup" | "login" | "profile";
@@ -103,6 +126,10 @@ export function getAuthErrorMessage(error: SupabaseErrorLike | null | undefined,
     }
 
     return "로그인을 완료하지 못했습니다. 잠시 후 다시 시도해주세요.";
+  }
+
+  if (message.includes("profiles_leetcode_username_key") || message.includes("leetcode_username")) {
+    return "This LeetCode username is already in use.";
   }
 
   if (error?.code === "23505" || message.includes("duplicate key")) {

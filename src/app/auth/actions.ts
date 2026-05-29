@@ -40,6 +40,7 @@ export async function signupAction(_: AuthActionState, formData: FormData): Prom
     email: getFormValue(formData, "email"),
     password: getFormValue(formData, "password"),
     displayName: getFormValue(formData, "displayName"),
+    leetcodeUsername: getFormValue(formData, "leetcodeUsername"),
     bojHandle: getFormValue(formData, "bojHandle"),
   });
 
@@ -49,7 +50,7 @@ export async function signupAction(_: AuthActionState, formData: FormData): Prom
 
   const supabase = await createClient();
   const redirectTo = `${await getRequestOrigin()}/auth/confirm`;
-  const { email, password, displayName, bojHandle } = parsed.data;
+  const { email, password, displayName, leetcodeUsername, bojHandle } = parsed.data;
 
   const { data, error } = await supabase.auth.signUp({
     email,
@@ -58,6 +59,7 @@ export async function signupAction(_: AuthActionState, formData: FormData): Prom
       emailRedirectTo: redirectTo,
       data: {
         display_name: displayName,
+        ...(leetcodeUsername ? { leetcode_username: leetcodeUsername } : {}),
         ...(bojHandle ? { boj_handle: bojHandle } : {}),
       },
     },
@@ -112,6 +114,7 @@ export async function logoutAction() {
 export async function updateProfileAction(_: AuthActionState, formData: FormData): Promise<AuthActionState> {
   const parsed = profileSchema.safeParse({
     displayName: getFormValue(formData, "displayName"),
+    leetcodeUsername: getFormValue(formData, "leetcodeUsername"),
     bojHandle: getFormValue(formData, "bojHandle"),
   });
 
@@ -132,6 +135,7 @@ export async function updateProfileAction(_: AuthActionState, formData: FormData
     {
       id: user.id,
       display_name: parsed.data.displayName,
+      ...(formData.has("leetcodeUsername") ? { leetcode_username: parsed.data.leetcodeUsername ?? null } : {}),
       boj_handle: parsed.data.bojHandle ?? null,
     },
     { onConflict: "id" },
