@@ -11,6 +11,7 @@ import {
   UsersRound,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { LandingHeroShowcase } from "@/components/landing-hero-showcase";
 
 type FeatureCard = {
   title: string;
@@ -20,79 +21,95 @@ type FeatureCard = {
   iconClassName: string;
 };
 
-type ServiceItem = {
+type WorkflowStep = {
+  step: string;
   title: string;
   description: string;
   icon: LucideIcon;
   iconClassName: string;
 };
 
-const workspaceImage =
-  "https://images.unsplash.com/photo-1535957998253-26ae1ef29506?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjB0ZWNoJTIwd29ya3NwYWNlJTIwcHJvZmVzc2lvbmFsfGVufDF8fHx8MTc3OTIwMTU1M3ww&ixlib=rb-4.1.0&q=80&w=1080";
-
-const collaborationImage =
-  "https://images.unsplash.com/photo-1517048676732-d65bc937f952?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx0ZWFtJTIwY29sbGFib3JhdGlvbiUyMG1lZXRpbmd8ZW58MXx8fHwxNzc5MTE5OTMxfDA&ixlib=rb-4.1.0&q=80&w=1080";
+type Metric = {
+  value: string;
+  label: string;
+  description: string;
+  className: string;
+};
 
 const featureCards: FeatureCard[] = [
   {
     title: "팀 스터디",
-    description: "명확한 목표를 가진 팀원들과 함께 빠르게 성장해요.",
-    details: ["문제 추천", "스터디 현황 추적", "소스코드 피드백"],
+    description: "팀 목표와 난이도에 맞는 문제를 함께 풀고 진행 상황을 공유합니다.",
+    details: ["팀별 문제 큐", "풀이 현황 추적", "스터디 피드백"],
     icon: UsersRound,
     iconClassName: "bg-blue-100 text-blue-600",
   },
   {
     title: "학습 관리",
-    description: "학습 상황을 자동 기록하고, 꾸준한 학습 경험을 만들어요.",
-    details: ["학습 상황 기록", "시각화된 대시보드", "학습 습관 형성"],
-    icon: Target,
+    description: "풀이 기록과 제출 흐름을 모아 꾸준한 학습 루틴을 만듭니다.",
+    details: ["최근 제출 확인", "학습 캘린더", "태그별 약점 파악"],
+    icon: CalendarCheck,
     iconClassName: "bg-orange-100 text-orange-600",
   },
   {
     title: "AI 학습 헬퍼",
-    description: "AI 분석을 통해 문제 접근에 대한 새로운 인사이트를 얻어요.",
-    details: ["AI 소스코드 분석", "AI 피드백", "복습 문제 추천"],
+    description: "코드 리뷰 관점의 힌트와 다음 복습 방향을 빠르게 확인합니다.",
+    details: ["코드 피드백", "복습 문제 추천", "접근법 점검"],
     icon: Sparkles,
     iconClassName: "bg-emerald-100 text-emerald-600",
   },
 ];
 
-const serviceItems: ServiceItem[] = [
+const workflowSteps: WorkflowStep[] = [
   {
-    title: "팀 스터디",
-    description:
-      "스터디 팀 생성과 문제 추천 설정으로 손쉽게 팀을 구성하고 진행 상황을 확인합니다.",
-    icon: UsersRound,
+    step: "01",
+    title: "LeetCode 사용자 연결",
+    description: "공개 username 기반으로 프로필, 언어, 태그, 최근 Accepted 흐름을 읽습니다.",
+    icon: Code2,
     iconClassName: "bg-blue-100 text-blue-600",
   },
   {
-    title: "학습 관리",
-    description:
-      "학습 기록을 시각화해 팀과 개인의 풀이 흐름을 꾸준히 관리합니다.",
-    icon: CalendarCheck,
+    step: "02",
+    title: "팀 목표에 맞춘 추천",
+    description: "난이도와 태그 후보를 조합해 지금 풀기 좋은 문제를 고릅니다.",
+    icon: Target,
     iconClassName: "bg-orange-100 text-orange-600",
   },
   {
-    title: "AI를 통한 학습",
-    description:
-      "AI가 소스코드를 분석해 피드백을 제공하고 다음 복습 방향을 제안합니다.",
-    icon: Code2,
-    iconClassName: "bg-yellow-100 text-yellow-700",
+    step: "03",
+    title: "풀이 기록과 피드백",
+    description: "최근 제출 기반 검증과 팀 코멘트로 다음 학습 액션을 남깁니다.",
+    icon: UsersRound,
+    iconClassName: "bg-emerald-100 text-emerald-600",
   },
 ];
 
-const stats = [
-  { value: "3,500+", label: "제공하는 문제 수", className: "text-blue-300" },
-  { value: "1,000+", label: "이용자 수", className: "text-emerald-300" },
-  { value: "250,000+", label: "해결한 문제 수", className: "text-orange-300" },
-  { value: "300+", label: "활동 중인 팀", className: "text-yellow-300" },
+const metrics: Metric[] = [
+  {
+    value: "LeetCode",
+    label: "문제 추천 기반",
+    description: "titleSlug와 태그 중심으로 문제 흐름을 관리합니다.",
+    className: "text-blue-300",
+  },
+  {
+    value: "Recent AC",
+    label: "최근 제출 기반 검증",
+    description: "공개 username 모드의 한계를 명확히 표시합니다.",
+    className: "text-emerald-300",
+  },
+  {
+    value: "Team Flow",
+    label: "팀 학습 기록",
+    description: "개인 풀이가 팀의 다음 액션으로 이어지게 만듭니다.",
+    className: "text-orange-300",
+  },
 ];
 
 function FeatureCard({ card }: { card: FeatureCard }) {
   const Icon = card.icon;
 
   return (
-    <article className="rounded-lg border border-white/70 bg-white/80 p-6 shadow-panel backdrop-blur transition hover:-translate-y-1 hover:shadow-xl">
+    <article className="rounded-lg border border-white/70 bg-white/85 p-6 shadow-panel backdrop-blur transition hover:-translate-y-1 hover:shadow-xl">
       <Icon className={`h-11 w-11 rounded-lg p-2 ${card.iconClassName}`} />
       <h3 className="mt-5 text-xl font-semibold text-slate-950">
         {card.title}
@@ -112,16 +129,19 @@ function FeatureCard({ card }: { card: FeatureCard }) {
   );
 }
 
-function ServiceItem({ item }: { item: ServiceItem }) {
+function WorkflowStep({ item }: { item: WorkflowStep }) {
   const Icon = item.icon;
 
   return (
-    <li className="rounded-lg border border-white/70 bg-white/80 p-4 shadow-sm backdrop-blur transition hover:shadow-lg">
-      <div className="flex gap-4">
+    <li className="rounded-lg border border-white/70 bg-white/85 p-5 shadow-sm backdrop-blur">
+      <div className="flex items-start gap-4">
         <Icon className={`h-11 w-11 shrink-0 rounded-lg p-2 ${item.iconClassName}`} />
         <div>
-          <h3 className="font-semibold text-slate-950">{item.title}</h3>
-          <p className="mt-1 text-sm leading-6 text-slate-600">
+          <p className="text-xs font-semibold tracking-[0.2em] text-slate-400">
+            STEP {item.step}
+          </p>
+          <h3 className="mt-1 font-semibold text-slate-950">{item.title}</h3>
+          <p className="mt-2 text-sm leading-6 text-slate-600">
             {item.description}
           </p>
         </div>
@@ -133,19 +153,19 @@ function ServiceItem({ item }: { item: ServiceItem }) {
 export function LandingPage() {
   return (
     <main className="overflow-hidden">
-      <section className="mx-auto grid min-h-[calc(100vh-112px)] max-w-7xl items-center gap-12 px-4 py-16 sm:px-6 lg:grid-cols-[1fr_0.92fr] lg:px-8 lg:py-20">
-        <div>
-          <p className="mb-5 inline-flex items-center rounded-full border border-white/70 bg-white/75 px-4 py-2 text-sm font-medium text-slate-600 shadow-sm backdrop-blur">
-            LeetCode 기반 팀 학습 플랫폼
+      <section className="mx-auto flex min-h-[calc(100vh-112px)] max-w-5xl flex-col items-center justify-center px-4 py-16 text-center sm:px-6 lg:px-8 lg:py-24">
+        <div className="flex flex-col items-center">
+          <p className="mb-5 inline-flex items-center rounded-full border border-white/70 bg-white/80 px-4 py-2 text-sm font-medium text-slate-600 shadow-sm backdrop-blur">
+            LeetCode 기반 팀 알고리즘 학습 플랫폼
           </p>
           <h1 className="text-5xl font-bold leading-tight text-slate-950 sm:text-6xl lg:text-7xl">
-            다같이 성장하는
+            팀과 함께 성장하는
             <br />
-            <span className="text-blue-600">Solve Spot</span>
+            <span className="text-blue-600">코딩 학습 코파일럿</span>
           </h1>
-          <p className="mt-8 max-w-xl text-lg leading-8 text-slate-600 sm:text-xl">
-            협업과 기록을 한곳에 모아 알고리즘 학습을 더 꾸준하게 이어가요.
-            팀의 목표를 정하고, 문제 추천부터 피드백까지 함께 관리하세요.
+          <p className="mt-8 max-w-2xl text-lg leading-8 text-slate-600 sm:text-xl">
+            문제 추천부터 풀이 기록, 코드 피드백까지 한곳에서 관리하세요.
+            Solve Spot은 팀의 학습 흐름을 더 선명하게 이어줍니다.
           </p>
           <div className="mt-9 flex flex-col gap-3 sm:flex-row">
             <Link
@@ -157,32 +177,45 @@ export function LandingPage() {
             </Link>
             <Link
               href="#services"
-              className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/70 bg-white/80 px-7 py-3 text-sm font-semibold text-slate-800 shadow-sm backdrop-blur transition hover:bg-white"
+              className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/70 bg-white/85 px-7 py-3 text-sm font-semibold text-slate-800 shadow-sm backdrop-blur transition hover:bg-white"
             >
               <PlayCircle className="h-5 w-5" />
               서비스 살펴보기
             </Link>
           </div>
-        </div>
 
-        <div className="relative">
-          <div className="absolute -inset-4 rounded-[28px] bg-white/35 blur-xl" />
-          <div
-            role="img"
-            aria-label="Solve Spot workspace preview"
-            className="relative aspect-[4/3] w-full rounded-[28px] bg-cover bg-center shadow-2xl shadow-blue-900/20"
-            style={{ backgroundImage: `url(${workspaceImage})` }}
-          />
+          <div className="mt-8 grid max-w-xl gap-3 sm:grid-cols-3">
+            {["문제 추천", "최근 제출 검증", "팀 피드백"].map((item) => (
+              <div
+                key={item}
+                className="rounded-lg border border-white/70 bg-white/70 px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm backdrop-blur"
+              >
+                {item}
+              </div>
+            ))}
+          </div>
         </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
+        <div className="mx-auto mb-10 max-w-3xl text-center">
+          <h2 className="text-3xl font-bold text-slate-950 sm:text-4xl">
+            풀이 화면부터 팀 학습 장면까지
+          </h2>
+          <p className="mt-4 text-lg leading-8 text-slate-600">
+            코드 목업과 실제 학습 분위기를 함께 넘겨보며 Solve Spot의 사용 흐름을 확인하세요.
+          </p>
+        </div>
+        <LandingHeroShowcase />
       </section>
 
       <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-3xl text-center">
           <h2 className="text-3xl font-bold text-slate-950 sm:text-4xl">
-            어렵기만 하던 알고리즘, 다함께 돌파해요
+            문제 풀이가 팀의 성장 기록이 되도록
           </h2>
           <p className="mt-4 text-lg leading-8 text-slate-600">
-            모든 팀원이 하나의 플랫폼에서 협력하고 성장할 수 있어요.
+            개인의 Accepted 하나가 추천, 복습, 팀 피드백으로 자연스럽게 이어집니다.
           </p>
         </div>
 
@@ -195,45 +228,51 @@ export function LandingPage() {
 
       <section
         id="services"
-        className="mx-auto grid max-w-7xl items-center gap-10 px-4 py-20 sm:px-6 lg:grid-cols-[0.95fr_1.05fr] lg:px-8"
+        className="mx-auto grid max-w-7xl items-center gap-10 px-4 py-20 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:px-8"
       >
-        <div
-          role="img"
-          aria-label="Team collaboration meeting"
-          className="aspect-[4/3] w-full rounded-lg bg-cover bg-center shadow-xl"
-          style={{ backgroundImage: `url(${collaborationImage})` }}
-        />
-
         <div>
-          <h2 className="text-3xl font-semibold text-slate-950">
-            우리가 제공하는 서비스
+          <p className="text-sm font-semibold tracking-[0.2em] text-blue-600">
+            HOW IT WORKS
+          </p>
+          <h2 className="mt-3 text-3xl font-semibold text-slate-950 sm:text-4xl">
+            Solve Spot은 풀이 전후의 흐름을 연결합니다
           </h2>
           <p className="mt-4 text-lg leading-8 text-slate-600">
-            팀 구성, 기록, 분석 흐름을 한 화면에서 이어가도록 설계했습니다.
+            문제와 풀이 결과가 이어지는 경험처럼, Solve Spot은 코딩 학습의 입력과 결과를
+            한 화면에서 이해할 수 있게 정리합니다.
           </p>
-          <ul className="mt-8 space-y-4">
-            {serviceItems.map((item) => (
-              <ServiceItem key={item.title} item={item} />
-            ))}
-          </ul>
         </div>
+
+        <ul className="space-y-4">
+          {workflowSteps.map((item) => (
+            <WorkflowStep key={item.step} item={item} />
+          ))}
+        </ul>
       </section>
 
       <section className="px-4 py-20 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl rounded-[28px] bg-slate-950 px-6 py-14 text-center shadow-2xl shadow-slate-950/20 sm:px-10">
           <BarChart3 className="mx-auto h-10 w-10 text-blue-300" />
           <h2 className="mt-5 text-3xl font-bold text-white">
-            수치가 입증하는 성과
+            검증 가능한 학습 신호만 모읍니다
           </h2>
-          <p className="mt-3 text-slate-300">Solve Spot이 만드는 학습 흐름</p>
+          <p className="mx-auto mt-3 max-w-2xl text-slate-300">
+            공개 username 모드의 한계를 숨기지 않고, 최근 제출과 문제 메타데이터를
+            기반으로 팀이 바로 움직일 수 있는 정보를 제공합니다.
+          </p>
 
-          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {stats.map((stat) => (
-              <div key={stat.label}>
-                <p className={`text-4xl font-bold ${stat.className}`}>
-                  {stat.value}
+          <div className="mt-10 grid gap-6 md:grid-cols-3">
+            {metrics.map((metric) => (
+              <div key={metric.label} className="text-left">
+                <p className={`text-3xl font-bold ${metric.className}`}>
+                  {metric.value}
                 </p>
-                <p className="mt-3 text-sm text-slate-300">{stat.label}</p>
+                <p className="mt-3 text-sm font-semibold text-white">
+                  {metric.label}
+                </p>
+                <p className="mt-2 text-sm leading-6 text-slate-300">
+                  {metric.description}
+                </p>
               </div>
             ))}
           </div>
@@ -242,7 +281,7 @@ export function LandingPage() {
             href="/login"
             className="mt-12 inline-flex items-center justify-center gap-2 rounded-lg bg-white px-8 py-3 text-sm font-semibold text-slate-950 transition hover:bg-slate-100"
           >
-            지금 시작하기
+            팀 학습 시작하기
             <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
