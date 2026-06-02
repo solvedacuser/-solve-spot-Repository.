@@ -25,6 +25,7 @@ import { FaRegCheckCircle } from "react-icons/fa";
 import { BsFire } from "react-icons/bs";
 import { RiTeamLine } from "react-icons/ri";
 import { MdOutlineQuestionMark } from "react-icons/md";
+import { FiUserCheck } from "react-icons/fi";
 
 ChartJS.register(
   CategoryScale,
@@ -44,7 +45,6 @@ const iconComponent = {
   checkCircle: FaRegCheckCircle,
   fire: BsFire,
   team: RiTeamLine,
-  info: MdOutlineQuestionMark,
 };
 
 export function Card({
@@ -60,7 +60,6 @@ export function Card({
     checkCircle: "text-green-500 bg-green-200 rounded-lg",
     fire: "text-red-500 bg-red-200 rounded-lg",
     team: "text-blue-500 bg-blue-200 rounded-lg",
-    info: "text-gray-500 bg-gray-200 rounded-lg",
   };
 
   const IconComponent = iconComponent[iconComponentName];
@@ -266,7 +265,7 @@ export function Calendar({ year, activityData }: activityDataProps) {
       <CalendarHeatmap
         startDate={startDate}
         endDate={endDate}
-        values={activityData}
+        values={activityData || []}
         classForValue={(datum) => {
           if (!datum) return "color-empty";
           return `color-scale-${Math.min(datum.count, 4)}`;
@@ -310,6 +309,47 @@ export function Calendar({ year, activityData }: activityDataProps) {
         place="left"
         float={true}
       ></ReactTootip>
+    </div>
+  );
+}
+
+interface ProgressBarProps {
+  progress: number;
+}
+
+function ProgressBar({ progress }: ProgressBarProps) {
+  const safeProgress = Math.min(progress, 100);
+  return (
+    <div className="w-full">
+      <div className="flex justify-between items-center mb-1.5">
+        <span className="text-sm font-semibold text-blue-600">
+          {safeProgress}%
+        </span>
+      </div>
+      <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+        <div
+          className="bg-blue-600 h-full rounded-full transition-all duration-500 ease-out"
+          style={{ width: `${safeProgress}%` }}
+        />
+      </div>
+    </div>
+  );
+}
+
+interface AttendceRateCardProps {
+  progress: number;
+}
+
+export function AttendceRateCard({ progress }: AttendceRateCardProps) {
+  return (
+    <div className="w-auto border-2 border-gray-100 rounded-lg bg-white text-black px-2 hover:shadow-lg transition-shadow">
+      <div className="ml-4 mt-4">
+        <FiUserCheck className="inline-block mr-2 w-8 h-8 p-1.5 text-orange-500 bg-yellow-100 rounded-lg"></FiUserCheck>
+        <span className="text-sm md:text-base">출석률</span>
+      </div>
+      <div className="text-lg md:text-2xl px-4 md:px-5 py-2 md:py-3">
+        <ProgressBar progress={progress}></ProgressBar>
+      </div>
     </div>
   );
 }
