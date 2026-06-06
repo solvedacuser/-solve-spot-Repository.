@@ -72,6 +72,36 @@ execute function public.set_updated_at();
 
 alter table public.team_members enable row level security;
 
+create or replace function public.check_team_insert_auth(target_team_id bigint, target_user_id uuid)
+returns boolean
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  member_count int;
+  is_leader boolean;
+begin
+  select count(*) into member_count
+  from public.team_members
+  where team_id = target_team_id;
+
+  if member_count = 0 then
+    return true;
+  end if;
+
+  select exists (
+    select 1
+    from public.team_members
+    where team_id = target_team_id
+      and user_id = target_user_id
+      and role = 'Leader'
+  ) into is_leader;
+
+  return is_leader;
+end;
+$$;
+
 drop policy if exists "team_members_select_self_or_leader" on public.team_members;
 create policy "team_members_select_self_or_leader"
 on public.team_members
@@ -83,11 +113,15 @@ using (
 );
 
 drop policy if exists "team_members_insert_leaders" on public.team_members;
-create policy "team_members_insert_leaders"
+drop policy if exists "team_members_insert_creator" on public.team_members;
+drop policy if exists "team_members_insert_ultimate" on public.team_members;
+create policy "team_members_insert_ultimate"
 on public.team_members
 for insert
 to authenticated
-with check (public.is_team_leader(team_id, (select auth.uid())));
+with check (
+  public.check_team_insert_auth(team_id, auth.uid())
+);
 
 drop policy if exists "team_members_update_leaders" on public.team_members;
 create policy "team_members_update_leaders"
