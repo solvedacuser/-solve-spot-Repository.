@@ -48,8 +48,8 @@ export function SiteNav({ isAuthenticated, userEmail, displayName }: SiteNavProp
               <Link href="/teams" className={navLinkClass(pathname === "/teams")}>
                 Teams
               </Link>
-              <Link href="/analysis" className={navLinkClass(pathname === "/analysis")}>
-                Ai-Analysis
+              <Link href="/helper" className={navLinkClass(pathname === "/helper")}>
+                Helper
               </Link>
             </nav>
           </div>
