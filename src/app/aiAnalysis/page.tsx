@@ -457,9 +457,7 @@ export default function DesktopSplitCodeChatUI() {
                   disabled={!input.trim() || isLoading}
                   className="p-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 focus:outline-none disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
                 >
-                  <svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-                    <path d="M3.478 2.404a.75.75 0 00-.926.941l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.404z" />
-                  </svg>
+                  <i className="w-5 h-2 pr-0.5 fa-solid fa-paper-plane justify-center text-center"></i>
                 </button>
               </div>
             </form>
