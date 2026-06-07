@@ -2,13 +2,15 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowRight,
-  BarChart3,
-  CheckCircle2,
-  Code2,
+  Crown,
+  Medal,
   Search,
   ShieldCheck,
   Target,
+  Trophy,
+  UsersRound,
 } from "lucide-react";
+import type { LandingTopTeam } from "@/lib/landing/top-teams";
 import heroImage from "@/images/landing-back.png";
 import Chip from "@mui/material/Chip";
 import img_HRProcess from "@/images/recruitmentProcess.png";
@@ -40,13 +42,33 @@ const featureCards = [
   },
 ];
 
-const workflowSteps = [
-  "LeetCode username을 입력합니다.",
-  "공개 프로필, 언어, 태그, 캘린더 데이터를 가져옵니다.",
-  "최근 Accepted 제출을 기준으로 추천과 검증을 제공합니다.",
+const rankStyles = [
+  {
+    badge: "bg-amber-100 text-amber-800 ring-amber-200",
+    icon: "bg-amber-50 text-amber-600",
+    border: "border-amber-200 bg-amber-50/40",
+  },
+  {
+    badge: "bg-slate-100 text-slate-700 ring-slate-200",
+    icon: "bg-slate-100 text-slate-600",
+    border: "border-slate-200 bg-white",
+  },
+  {
+    badge: "bg-orange-100 text-orange-800 ring-orange-200",
+    icon: "bg-orange-50 text-orange-600",
+    border: "border-orange-100 bg-white",
+  },
 ];
 
-export function LandingPage() {
+type LandingPageProps = {
+  topTeams?: LandingTopTeam[];
+};
+
+function formatLeaderName(teamLeader: string | null) {
+  return teamLeader ? `@${teamLeader}` : "팀장 정보 없음";
+}
+
+export function LandingPage({ topTeams = [] }: LandingPageProps) {
   return (
     <main className="overflow-hidden text-slate-950">
       <section className="relative min-h-[960px] overflow-hidden px-4 pt-28 text-center sm:min-h-[1040px] sm:px-6 lg:min-h-[1180px] lg:px-8">
@@ -134,6 +156,100 @@ export function LandingPage() {
         </div>
       </section>
 
+      <section className="bg-slate-50 px-4 py-20 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl">
+          <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+            <div>
+              <div className="inline-flex items-center gap-2 text-sm font-semibold text-blue-700">
+                <Trophy className="h-4 w-4" />
+                Team leaderboard
+              </div>
+              <h2 className="mt-3 text-3xl font-bold tracking-normal text-slate-950 sm:text-4xl">
+                지금 가장 활발한 상위 팀
+              </h2>
+              <p className="mt-4 max-w-2xl text-base leading-8 text-slate-600 sm:text-lg">
+                팀별 해결 문제 수를 기준으로 상위 3개 팀을 보여줍니다.
+              </p>
+            </div>
+            <Link
+              href="/teams"
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-800 shadow-sm transition hover:border-blue-200 hover:text-blue-700"
+            >
+              전체 팀 보기
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+
+          {topTeams.length > 0 ? (
+            <div className="mt-10 grid gap-5 md:grid-cols-3">
+              {topTeams.map((team, index) => {
+                const style = rankStyles[index] ?? rankStyles[1];
+
+                return (
+                  <article
+                    key={team.teamId}
+                    className={`rounded-lg border p-6 shadow-[0_16px_45px_rgba(15,23,42,0.06)] ${style.border}`}
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div
+                        className={`flex h-12 w-12 items-center justify-center rounded-lg ${style.icon}`}
+                      >
+                        {team.rank === 1 ? (
+                          <Crown className="h-6 w-6" />
+                        ) : (
+                          <Medal className="h-6 w-6" />
+                        )}
+                      </div>
+                      <span
+                        className={`rounded-full px-3 py-1 text-xs font-bold ring-1 ${style.badge}`}
+                      >
+                        {team.rank}위
+                      </span>
+                    </div>
+
+                    <h3 className="mt-5 truncate text-xl font-bold text-slate-950">
+                      {team.teamName}
+                    </h3>
+                    <p className="mt-2 truncate text-sm font-medium text-slate-500">
+                      {formatLeaderName(team.teamLeader)}
+                    </p>
+
+                    <div className="mt-6 grid grid-cols-2 gap-3">
+                      <div className="rounded-lg border border-slate-200 bg-white/80 p-4">
+                        <div className="text-2xl font-bold text-slate-950">
+                          {team.solved.toLocaleString()}
+                        </div>
+                        <div className="mt-1 text-xs font-medium text-slate-500">
+                          해결 문제
+                        </div>
+                      </div>
+                      <div className="rounded-lg border border-slate-200 bg-white/80 p-4">
+                        <div className="flex items-center gap-2 text-2xl font-bold text-slate-950">
+                          <UsersRound className="h-5 w-5 text-slate-400" />
+                          {team.memberCount.toLocaleString()}
+                        </div>
+                        <div className="mt-1 text-xs font-medium text-slate-500">
+                          팀원
+                        </div>
+                      </div>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="mt-10 rounded-lg border border-dashed border-slate-300 bg-white p-8 text-center">
+              <p className="text-base font-semibold text-slate-800">
+                아직 집계된 팀 랭킹이 없습니다.
+              </p>
+              <p className="mt-2 text-sm leading-6 text-slate-500">
+                팀이 문제를 해결하면 이곳에 상위 3개 팀이 표시됩니다.
+              </p>
+            </div>
+          )}
+        </div>
+      </section>
+
       <section className="flex flex-col w-full justify-center py-32 pb-60 sm:py-44 md:py-60 lg:py-80 lg:pb-96 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="text-center text-xl sm:2xl md:text-3xl lg:text-4xl mb-24 md:mb-32 lg:mb-52 hover:scale-125 duration-100">
@@ -173,7 +289,7 @@ export function LandingPage() {
                   </span>
                   <br />
                   <span className="inline-block pt-2 pb-1">
-                    <b>'코딩 테스트'</b>라는 <b>장벽</b>,
+                    <b>&apos;코딩 테스트&apos;</b>라는 <b>장벽</b>,
                   </span>
                   <br />
                   <span className="inline-block">
@@ -221,12 +337,12 @@ export function LandingPage() {
                 </span>
                 <p className="text-base sm:text-lg md:text-xl text-slate-500 font-medium pt-2">
                   <span className="inline-block pb-2">
-                    <b>'문제 정의 및 구조화'</b>, <b>'테스트와 검증'</b>,{" "}
-                    <b>'설계 능력'</b>
+                    <b>&apos;문제 정의 및 구조화&apos;</b>, <b>&apos;테스트와 검증&apos;</b>,{" "}
+                    <b>&apos;설계 능력&apos;</b>
                   </span>
                   <br />
                   <span className="inline-block">
-                    그 시작은 <b>'알고리즘'</b>과 <b>자료구조'</b>입니다.
+                    그 시작은 <b>&apos;알고리즘&apos;</b>과 <b>자료구조&apos;</b>입니다.
                   </span>
                 </p>
               </div>
@@ -286,77 +402,6 @@ export function LandingPage() {
         </div>
       </section>
 
-      <section
-        id="services"
-        className="bg-slate-950 px-4 py-24 text-white sm:px-6 lg:px-8"
-      >
-        <div className="mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[0.9fr_1.1fr]">
-          <div>
-            <Code2 className="h-11 w-11 text-blue-300" />
-            <h2 className="mt-5 text-3xl font-bold tracking-normal sm:text-4xl">
-              LeetCode 통합은 서버 안에서만 처리합니다
-            </h2>
-            <p className="mt-5 text-base leading-8 text-slate-300 sm:text-lg">
-              클라이언트는 로컬 API Route만 호출하고, LeetCode GraphQL 응답은
-              Zod로 검증한 뒤 앱에 필요한 데이터만 돌려줍니다.
-            </p>
-            <Link
-              href="/leetcode-api"
-              className="mt-8 inline-flex items-center justify-center gap-2 rounded-md bg-white px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-slate-100"
-            >
-              API 워크벤치 보기
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
-
-          <ol className="grid gap-4">
-            {workflowSteps.map((step, index) => (
-              <li
-                key={step}
-                className="flex items-start gap-4 rounded-lg border border-white/10 bg-white/[0.06] p-5"
-              >
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-400 text-sm font-bold text-slate-950">
-                  {index + 1}
-                </span>
-                <span className="pt-1 text-base font-medium leading-7 text-slate-100">
-                  {step}
-                </span>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
-        <div className="grid gap-10 lg:grid-cols-[1fr_0.8fr] lg:items-center">
-          <div>
-            <BarChart3 className="h-11 w-11 text-blue-600" />
-            <h2 className="mt-5 text-3xl font-bold tracking-normal text-slate-950 sm:text-4xl">
-              정확히 모르는 것은 UNKNOWN으로 남깁니다
-            </h2>
-            <p className="mt-5 max-w-2xl text-base leading-8 text-slate-600 sm:text-lg">
-              공개 username 모드에서는 완전한 solved 목록을 보장할 수 없습니다.
-              그래서 추천은 최근 Accepted 제출만 제외하고, 검증도 확인 가능한
-              범위 안에서만 판단합니다.
-            </p>
-          </div>
-
-          <div className="rounded-lg border border-slate-200 bg-slate-50 p-6">
-            <ul className="space-y-4 text-sm leading-7 text-slate-700">
-              {[
-                "최근 Accepted에 있으면 SOLVED로 표시",
-                "최근 Accepted에 없으면 UNSOLVED가 아니라 UNKNOWN으로 표시",
-                "LeetCode 문제 식별자는 titleSlug를 우선 사용",
-              ].map((item) => (
-                <li key={item} className="flex gap-3">
-                  <CheckCircle2 className="mt-1 h-4 w-4 shrink-0 text-emerald-600" />
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </section>
     </main>
   );
 }
