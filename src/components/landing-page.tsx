@@ -32,15 +32,8 @@ const workflowSteps = [
 
 export function LandingPage() {
   return (
-    <main
-      className="overflow-hidden text-slate-950"
-      style={{
-        background:
-          "radial-gradient(circle at top left, rgba(20, 184, 166, 0.18), transparent 28%), radial-gradient(circle at top right, rgba(249, 115, 22, 0.16), transparent 24%), linear-gradient(180deg, #ecfeff 0%, #f8fafc 44%, #fff7ed 100%)",
-      }}
-    >
-      <section className="relative min-h-[860px] overflow-hidden bg-[#f6fbff] px-4 pt-28 text-center sm:px-6 lg:min-h-[900px] lg:px-8">
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-72 bg-gradient-to-b from-white via-white/90 to-transparent" />
+    <main className="overflow-hidden text-slate-950">
+      <section className="relative min-h-[960px] overflow-hidden px-4 pt-28 text-center sm:min-h-[1040px] sm:px-6 lg:min-h-[1180px] lg:px-8">
         <div className="relative z-10 mx-auto flex max-w-4xl flex-col items-center">
           <h1 className="max-w-4xl text-5xl font-bold leading-[1.15] tracking-normal text-slate-950 sm:text-6xl lg:text-7xl">
             LeetCode 풀이를 분석하고
@@ -79,16 +72,15 @@ export function LandingPage() {
           </p>
         </div>
 
-        <div className="pointer-events-none absolute inset-x-1/2 bottom-[-12px] z-0 w-[1480px] max-w-none -translate-x-1/2 sm:bottom-[-42px] lg:bottom-[-64px]">
+        <div className="pointer-events-none absolute inset-x-1/2 bottom-0 z-0 w-screen max-w-none -translate-x-1/2 [mask-image:linear-gradient(to_bottom,transparent_0%,black_18%,black_100%)]">
           <Image
             src={heroImage}
             alt="코딩 학습과 LeetCode 분석을 표현한 3D 오브젝트"
             priority
             className="h-auto w-full select-none"
-            sizes="(max-width: 768px) 1180px, 1480px"
+            sizes="100vw"
           />
         </div>
-        <div className="pointer-events-none absolute inset-x-0 bottom-[-1px] z-[1] h-44 bg-gradient-to-b from-white/0 via-[#f8fafc]/90 to-[#f8fafc] sm:h-52 lg:h-60" />
       </section>
 
       <section className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
