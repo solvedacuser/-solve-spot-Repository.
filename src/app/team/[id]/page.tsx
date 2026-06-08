@@ -8,6 +8,11 @@ import {
   Trophy, ChevronRight, X, Search, Loader2 , Check, Play
 } from 'lucide-react';
 
+import { 
+  ResponsiveContainer,PieChart, Pie
+  
+} from 'recharts';
+
 import { Noto_Sans_KR } from 'next/font/google';
 
 const notoSansKr = Noto_Sans_KR({
@@ -40,7 +45,7 @@ function TeamProgress({ data } : {data : any[]}){
                 </div>
               </div>
 
-              {/* 문제별 진행 현황 데이터가 없을 때의 Empty State */}
+              {/* 진행 현황 데이터가 없을 때 UI */}
               {data.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-12 text-center border border-dashed border-gray-200 rounded-xl bg-gray-50/50">
                   <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-400 mb-3">
@@ -56,7 +61,7 @@ function TeamProgress({ data } : {data : any[]}){
                     
                     return (
                       <div key={prob.id} className="border border-gray-200 rounded-xl p-4 transition-colors hover:border-indigo-200">
-                        {/* 문제 제목 및 진행률 바 */}
+                        {/* 문제 제목 및 진행률 */}
                         <div className="flex flex-col gap-2 mb-4">
                           <div className="flex justify-between items-center">
                             <div className="flex items-center gap-2">
@@ -67,7 +72,7 @@ function TeamProgress({ data } : {data : any[]}){
                               완료 {progressRatio}%
                             </span>
                           </div>
-                          {/* 진행률 바 */}
+                          {/* 진행률 차트 */}
                           <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden mt-1">
                             <div 
                               className="h-full bg-[#48db4e] rounded-full transition-all duration-500"
@@ -118,13 +123,142 @@ function TeamProgress({ data } : {data : any[]}){
     )
 }
 
+function StudySessionStats({ data } : {data : any}) {
+ 
+  if (!data) {
+    return (
+      <section className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm mb-6 w-full">
+        <div className="text-center py-6 text-gray-400 text-sm">
+          데이터를 불러오는 중입니다...
+        </div>
+      </section>
+    );
+  }
+  const totalSessions = data.totalSession; 
+  const completedSessions = data.participants;
+  
+  
+  let hasActiveStudy = totalSessions > 0; 
+  
+  const progressPercent = hasActiveStudy ? Math.round((completedSessions / totalSessions) * 100) : 0;
+
+  const chartData = [
+    { name: 'Completed', value: completedSessions, fill: '#22C55E' }, 
+    { name: 'Remaining', value: totalSessions - completedSessions, fill: '#E5E7EB' },
+  ];
+
+  return (
+    <section className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm mb-6 w-full">
+      
+      {/* 구분자 */}
+      <div className="flex justify-between items-center mb-6 pb-4 border-b border-slate-200">
+        <div className="flex items-center gap-2">
+          <div className="w-7 h-7 bg-indigo-50 rounded-lg flex items-center justify-center text-indigo-500 text-[13px]">
+            <i className="fa-solid fa-chart-pie" />
+          </div>
+          <span className="text-[15px] font-bold text-gray-900">스터디 Overview</span>
+        </div>
+      </div>
+
+      {!hasActiveStudy ? (
+        
+        <div className="flex flex-col items-center justify-center py-12 text-center border border-dashed border-gray-200 rounded-xl bg-gray-50/50 mb-2">
+          <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center text-gray-400 mb-4 shadow-sm">
+            <i className="fa-solid fa-chart-pie text-lg"></i>
+          </div>
+          <p className="text-gray-700 font-bold text-[15px]">진행 중인 스터디 통계가 없습니다.</p>
+          <p className="text-gray-500 text-[13px] mt-1.5">새로운 스터디를 시작하고 멤버들과 진행률을 공유해보세요!</p>
+        </div>
+      ) : (
+        
+        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-10 w-full">
+          {/* 원형 바 */}
+          <div className="relative w-60 h-60 flex-shrink-0 pb-3 sm:ml-3">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={chartData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={70} 
+                  outerRadius={90} 
+                  startAngle={90}  
+                  endAngle={-270}  
+                  dataKey="value"
+                  stroke="none"    
+                  isAnimationActive={true} 
+                />
+              </PieChart>
+            </ResponsiveContainer>
+
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
+              <span className="text-[32px] font-extrabold text-[#1e293b] leading-none tracking-tight mb-1">
+                {progressPercent}%
+              </span>
+              <span className="text-[13px] font-bold text-[#334155] leading-tight">
+                참여율
+              </span>
+              <span className="text-[11px] font-bold text-gray-500 mt-1">
+                {data.presentSession} 회차 진행 중
+              </span>
+            </div>
+          </div>
+
+          
+          <div className="flex flex-col flex-1 w-full mt-2">
+            <h3 className="text-[15px] font-bold text-[#1e293b] mb-5">Study Session Progress</h3>
+
+            <div className="flex flex-col gap-4 mb-6 w-full">
+              <div className="flex items-start gap-3">
+                <div className="w-5 h-5 mt-0.5 rounded-full bg-[#22C55E] flex items-center justify-center text-white shrink-0 shadow-sm">
+                  <Check size={12} strokeWidth={4} />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[13px] font-bold text-[#1e293b]">{data.presentSession}회차 진행 완료</span>
+                  <span className="text-[12px] font-medium text-gray-500 mt-0.5">정규 세션 분석 및 상호 코드 리뷰 프로세스 완료</span>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <div className="w-5 h-5 mt-0.5 rounded-full bg-[#FBBF24] flex items-center justify-center text-white shrink-0 shadow-sm">
+                  <Play size={10} fill="currentColor" className="ml-0.5" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[13px] font-bold text-[#1e293b]">다음 회차 ({data.presentSession + 1}회차) 준비 중</span>
+                  <span className="text-[12px] font-medium text-gray-500 mt-0.5">예정 난이도 : Medium</span>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <div className="w-5 h-5 mt-0.5 rounded-full bg-[#F59E0B] flex items-center justify-center text-white shrink-0 shadow-sm">
+                  
+                  <i className="fa-solid fa-crown" style={{fontSize : "10px"}}></i>
+                  
+                </div>
+                <div className="flex flex-col">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[13px] font-bold text-[#1e293b]">현재 스터디 MVP</span>
+                    <span className="text-[10px] font-bold bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded">{data.mvp}</span>
+                  </div>
+                  <span className="text-[12px] font-medium text-gray-500 mt-0.5">가장 높은 문제 해결률 및 활발한 코드 리뷰 참여</span>
+                </div>
+              </div>
+              
+            </div>
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}
+
 
 
 
 export default function AlgorithmDashboard() {
     const params = useParams() 
     const teamId = params.id
-    // console.log("teamId ", teamId)
+    
     const [supabase] = useState(() => createClient()) 
     const [teamInfo, setTeamInfo] = useState<any>('')
     const [teamMembers, setTeamMembers] = useState<any>([])
@@ -147,10 +281,11 @@ export default function AlgorithmDashboard() {
                 .eq('rid', teamId)
                 .single()
             setTeamInfo(data ?? null)
+            
             let members = []
             members.push({name : data.teamLeader, suffix : '', email : data.teamLeader + "@gmail.com", initial : data.teamLeader[0].toUpperCase(), role : '팀장', isMe: true })
             data.UserList.forEach((elem:any) => {
-              members.push({name : elem.user_id, suffix : '', email : elem.leetcodeId, initial : elem.user_id[0].toUpperCase(), role : '', isMe: false })
+              members.push({name : elem.boj_handle, suffix : '', email : elem.boj_handle, initial : elem.boj_handle[0].toUpperCase(), role : '', isMe: false })
             })
             setTeamMembers(members)
               console.log("team", data.UserList)
@@ -159,7 +294,7 @@ export default function AlgorithmDashboard() {
         
     },[teamId])
     
-    // console.log("teaminfo ", JSON.parse(teamInfo?.UserList?.[0]).rid)
+    
     const [dates, setDates] = useState<any>([])
     useEffect(() => {
       let dateData = []
@@ -188,28 +323,28 @@ export default function AlgorithmDashboard() {
         week.setHours(0, 0, 0, 0)
 
         let { data: problems, error } = await supabase
-        .from('problems')
+        .from('team_mission_solves')
         .select('*')
-        .eq('teamId', teamId)
-        .gte("created_at", week.toISOString())
-        if(!problems) return 
+        .eq('team_id', teamId)
+        .gte("solved_at", week.toISOString())
+        if(!problems) return
         
         
         let activities:any = {}
         activities[teamInfo.teamLeader] = [0,0,0,0,0,0,0]
         teamInfo.UserList.forEach((elem:any) => {
-          activities[elem.user_id] = [0,0,0,0,0,0,0]
+          activities[elem.boj_handle] = [0,0,0,0,0,0,0]
         })
         problems.forEach((elem:any) => {
-          
-          const dateSeries = new Date(new Date(elem.created_at).toLocaleDateString("en-US", {timeZone : "Asia/Seoul"}))
+          console.log(elem)
+          const dateSeries = new Date(new Date(elem.solved_at).toLocaleDateString("en-US", {timeZone : "Asia/Seoul"}))
           const today = new Date()
           
           const diff = today.getTime() - dateSeries.getTime()
           const diffDays = Math.floor(diff / (1000 * 60 * 60 * 24))
           if(diffDays >= 0 && diffDays < 7){
             const idx = 6 - diffDays
-            activities[elem.user_id][idx]++
+            activities[elem.leetcode_username][idx]++
           } 
         
           
@@ -221,8 +356,9 @@ export default function AlgorithmDashboard() {
         
         datas.push({name : userId, initial : userId[0].toUpperCase(), isMe : user == userId ? true : false, records : data})
       })
+      console.log("계산된 activities:", activities);
       setActivity(datas)
-      // console.log("activity", activity)
+      
         
       }
       getActivity()
@@ -231,6 +367,10 @@ export default function AlgorithmDashboard() {
       
      
     },[teamInfo])
+
+    useEffect(() => { 
+
+    }, [])
     
     // 모달 관리를 위한 State
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -241,17 +381,19 @@ export default function AlgorithmDashboard() {
     const [missionInfo, setMissionInfo] = useState<any>(null)
     const [isLoadingMissions, setIsLoadingMissions] = useState(false);
 
-    // === 이미지 UI 매칭을 위한 신규 상태 추가 ===
+    
     const [isAutoRecommend, setIsAutoRecommend] = useState(true);
     const [selectedDays, setSelectedDays] = useState<string[]>(['월', '화', '수', '목', '금']);
 
-    // 미션 리스트를 상태로 관리하여 상태 변경 시 리렌더링되게 합니다.
+    
     const [missionList, setMissionList] = useState<any[]>([]);
-    // 현재 로딩 중인 미션의 ID를 저장합니다. (여러 개 동시 클릭 대비 배열로 관리)
+    
     const [loadingIds, setLoadingIds] = useState<number[]>([]);
     const [verifyDate, setVerifyDate] = useState()
     const [participant, setParticipant] = useState<any[]>([])
     const [infoTags, setInfoTags] = useState<any[]>([])
+    const [solveProblem, setSolveProblem] = useState<any>([])
+    const [chartData, setChartData]= useState<any>()
     useEffect(() => {
         const getMissionInfo = async() => {
             let { data, error } = await supabase
@@ -266,10 +408,59 @@ export default function AlgorithmDashboard() {
             console.log("mission info", data?.[0]?.missions)
             
             // console.log("tags", tagSeries)
-            // console.log()
+            console.log("mission data ", data)
         }
         getMissionInfo()
+        
     },[teamId])
+
+    useEffect(() => {
+      const getChartData = async() => {
+        let { data:solves, error } = await supabase
+        .from('team_mission_solves')
+        .select("*")
+        .eq('team_id', teamId)
+        
+
+        setSolveProblem(solves)
+
+
+        let data = {"totalSession" : 0, "participants" : 0, "presentSession" : 0, "mvp" : "EMPTY"}
+        let solver:any = []
+        
+        teamMembers.forEach((elem:any) => {
+          solver.push({name : elem.name, solves : 0})
+        })
+        if(solves){
+          data.presentSession = solves.length
+          
+          data.participants = solves.length
+          solves.forEach((elem:any) => {
+            for(let member of solver){
+              if(member.name == elem.leetcode_username) member.solves++
+            }
+          })
+
+        }
+        solver = solver.sort((a:any,b:any) => b.solves - a.solves)
+        
+        data.mvp = solver.length > 0 ?  solver[0].name : "Empty"
+        
+        if(missionInfo){
+          data.presentSession = missionInfo.length
+          missionInfo.forEach((elem:any) => {
+            data.totalSession+=elem.missions.length
+            
+          })
+        }
+        data.totalSession *= teamMembers.length
+        console.log("chart data", data)
+        
+        setChartData(data)
+      }
+      getChartData()
+
+    }, [teamId, missionInfo])
 
     useEffect(() => {
      
@@ -280,10 +471,10 @@ export default function AlgorithmDashboard() {
 
         const solver = teamInfo.UserList.map((elem:any) => {
           
-          const isSolved = solved.includes(elem.user_id)
+          const isSolved = solved.includes(elem.boj_handle)
           return {
-            id : elem.user_id ? elem.user_id[0].toUpperCase() : "A",
-            name : elem.user_id,
+            id : elem.boj_handle ? elem.boj_handle[0].toUpperCase() : "A",
+            name : elem.boj_handle,
             status : isSolved ? 'completed' : 'working',
             isMe :  false
           }
@@ -319,6 +510,10 @@ export default function AlgorithmDashboard() {
     },[missionList, teamInfo])
     
     const getRecommend = async() => {
+      if(user != teamInfo.teamLeader){
+        alert("스터디 최신화는 팀장만 가능합니다")
+        return
+      } 
       setIsLoadingMissions(true);
         const response = await fetch("/api/v1/recommends", {
             method: 'POST',
@@ -344,14 +539,15 @@ export default function AlgorithmDashboard() {
           .select()
         if(!error){
         //   toast.warning("스터디 생성 성공" , { position: "bottom-right" } )
-          setMissionInfo(data)
+          // setMissionInfo(data)
+          setMissionInfo((prev: any) => [data[0], ...prev]);
           console.log("missioninfo", missionInfo)
           setMissionList(data[0].missions)
           setVerifyDate(data[0].created_At)
           setIsLoadingMissions(false);
         }
         else{
-          alert("recommend error")
+          alert("Database error")
           setIsLoadingMissions(false);
         }
     }
@@ -377,7 +573,7 @@ export default function AlgorithmDashboard() {
         setSelectedTags(selectedTags.filter(tag => tag !== tagToRemove));
     };
 
-    // 요일 토글 핸들러
+    
     const handleToggleDay = (day: string) => {
         if (selectedDays.includes(day)) {
         setSelectedDays(selectedDays.filter(d => d !== day));
@@ -387,17 +583,18 @@ export default function AlgorithmDashboard() {
     };
 
     // let user = "chcl77"
-    const isTeamMember = teamInfo?.teamLeader === user || teamInfo?.UserList?.some((member: any) => member.user_id === user);
+    const isTeamMember = teamInfo?.teamLeader === user || teamInfo?.UserList?.some((member: any) => member.boj_handle === user);
     
-  // === Verify 연결 ===
+  
   const handleVerifyClick = async(id: number, titleSlug:string) => {
+    
     setLoadingIds((prev) => [...prev, id]);
     const response = await fetch("/api/v1/verify", {
       method : 'POST',
       headers : {
         'Content-Type' : 'application/json'
       },
-      body : JSON.stringify({title : titleSlug, user : user, missionList : missionList, created_At : verifyDate, teamId : teamId})
+      body : JSON.stringify({title : titleSlug, user : user, missionList : missionList, created_At : verifyDate, teamId : teamId, session : session})
     })
     const res = await response.json()
     console.log("status", res.status)
@@ -405,7 +602,8 @@ export default function AlgorithmDashboard() {
     if(res.status){
       // toast 성공
     //   toast.warning("검증 성공" , { position: "bottom-right" } )
-      setMissionInfo(res.data)
+      // setMissionInfo(res.data)
+      setMissionInfo((prev: any) => [res.data[0], ...prev]);
       setMissionList(res.data[0].missions)
       setVerifyDate(res.data[0].created_At)
     }
@@ -445,13 +643,14 @@ export default function AlgorithmDashboard() {
           </div>
         </header>
 
-        {/* 메인 그리드 레이아웃 구성 */}
+        {/* 메인 그리드 구성 */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
           {/* 좌측 영역 */}
           <div className="lg:col-span-2 space-y-6">
-            
-            {/* 미션 section */}
+          
+            <StudySessionStats data = {chartData}/>
+            {/* 미션 섹션 부분 */}
             <section className="bg-white rounded-xl border border-blue-100 p-5 shadow-sm">
               <div className="flex justify-between items-center mb-4 border-b border-slate-200 pb-[15px]">
                 <div className="flex items-center gap-2 text-blue-600">
@@ -464,7 +663,13 @@ export default function AlgorithmDashboard() {
                 </div>
                 <div className="flex items-center gap-2">
                   <button 
-                    onClick={() => setIsSettingsOpen(true)}
+                    onClick={() => {
+                      if(user != teamInfo.teamLeader){
+                        alert("스터디 최신화는 팀장만 가능합니다")
+                        return
+                      } 
+                      setIsSettingsOpen(true)
+                    } }
                     className="flex items-center gap-1 text-xs border border-gray-200 bg-white px-2 py-1.5 rounded hover:bg-gray-100 transition-colors text-gray-600"
                   >
                     <i className="fa-solid fa-arrows-rotate"></i> 스터디 생성 / 초기화
@@ -513,11 +718,11 @@ export default function AlgorithmDashboard() {
                             </div>
                           </div>
                           
-                          <div className="flex items-start gap-2 mb-4"> {/*item-center */}
-                            <div className={`w-5 h-5 mt-0.5 rounded-sm flex items-center justify-center text-[10px] font-bold text-white bg-[#0087ff] `}> {/*no mt */}
+                          <div className="flex items-start gap-2 mb-4"> 
+                            <div className={`w-5 h-5 mt-0.5 rounded-sm flex items-center justify-center text-[10px] font-bold text-white bg-[#0087ff] `}> 
                               <i className="fa-solid fa-code"></i>
                             </div>
-                            <h3 className="font-bold text-[15px] flex-1 line-clamp-2 break-keep leading-tight">{mission.title}</h3>{/*after text truncate */}
+                            <h3 className="font-bold text-[15px] flex-1 line-clamp-2 break-keep leading-tight">{mission.title}</h3>
                           </div>
 
                           <div className="flex flex-wrap gap-[5px] mb-4">
@@ -836,7 +1041,7 @@ export default function AlgorithmDashboard() {
                 
               </div>
 
-              {/* 문제 수 섹션 레이아웃 */}
+              {/* 문제 수 섹션 */}
               <div>
                 <div className="flex justify-between items-center mb-3">
                   <label className="text-sm font-semibold text-gray-800">
