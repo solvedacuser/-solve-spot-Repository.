@@ -40,11 +40,12 @@ on public.team ("createdAt" desc);
 alter table public.team enable row level security;
 
 drop policy if exists "team_select_members" on public.team;
-create policy "team_select_members"
+drop policy if exists "team_select_public" on public.team;
+create policy "team_select_public"
 on public.team
 for select
-to authenticated
-using (public.is_team_member(rid, (select auth.uid())));
+to anon, authenticated
+using (true);
 
 drop policy if exists "team_insert_authenticated" on public.team;
 create policy "team_insert_authenticated"

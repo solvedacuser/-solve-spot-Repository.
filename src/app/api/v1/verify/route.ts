@@ -6,7 +6,7 @@ import { createClient } from "@/utils/supabase/client"
 
 export async function POST(request : Request){
     const supabase = createClient()
-    const {title, user, missionList, created_At, teamId} = await request.json()
+    const {title, user, missionList, created_At, teamId, session} = await request.json()
     console.log("title", title, user, created_At)
     let status = false
     
@@ -24,12 +24,8 @@ export async function POST(request : Request){
                 if(mission){
                     mission.solved.push(user)
                     status = true 
-                    const { data, error } = await supabase
-                        .from('problems')
-                        .insert([
-                            { user_id : user, teamId : teamId, title : mission.title, pNum : mission.problemNum },
-                        ])
-                        .select()
+                    
+                    
                     break
                 }
                
@@ -42,6 +38,16 @@ export async function POST(request : Request){
     .update({ missions: missionList })
     .eq("created_At", created_At)
     .select()
+    console.log("data " , data)
+    
+    const {error : insertError} =  await supabase
+        .from('team_mission_solves')
+        .insert([
+            // { user_id : user, teamId : teamId, title : mission.title, pNum : mission.problemNum },
+            {team_mission_id : data?.[0]?.rid , team_id : teamId, leetcode_username : user, title_slug : title, difficulty : data?.[0]?.difficulty}
+        ])
+        .select()
+        if(insertError) console.log("error : ", insertError)
     
     return NextResponse.json({"status" : status, data : error ? null : data})
 }

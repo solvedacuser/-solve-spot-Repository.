@@ -28,7 +28,13 @@ import {
 import { Field, FieldGroup } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Noto_Sans_KR } from 'next/font/google';
 
+const notoSansKr = Noto_Sans_KR({
+  subsets: ['latin'], 
+  weight: ['400', '500', '600', '700', '800'],
+  display: 'swap',
+});
 
 import { useToast } from "@/hooks/use-toast"
 
@@ -65,6 +71,7 @@ import { Session } from "@supabase/supabase-js";
         .select('*')
         setTeam(team)
         console.log("teams", team)
+        if(error)
         console.log("team error " ,error)
         }
         getTeam()
@@ -80,13 +87,13 @@ import { Session } from "@supabase/supabase-js";
 
     const getUser = async() => {
             let { data: user, error } = await supabase
-            .from('user')
+            .from('profiles')
             .select("*")
-            .eq('user_id', coworker)
-            .single()
+            .eq('boj_handle', coworker)
+            .maybeSingle()
             if(user){
-                console.log("Detected", user.user_id)
-                if(!member?.find((elem) => elem.user_id == user.user_id)){
+                console.log("Detected", user.boj_handle)
+                if(!member?.find((elem) => elem.boj_handle == user.boj_handle)){
                     setMember([...member, user])
                 }
             }
@@ -111,26 +118,54 @@ import { Session } from "@supabase/supabase-js";
         member.map((elem) => {
             members.push(elem.id)
         })
+        try {
+        const { data: userData } = await supabase.auth.getUser();
+
+        console.log("data", userData.user);
         const { data, error } = await supabase
         .from('team')
         .insert([
             { teamName: name, description: username, teamLeader: session?.user.user_metadata.boj_handle,  UserList: member, isActivated : 1}
         ])
         .select()
+        const {error: LeaderError} = await supabase
+            .from('team_members')
+            .insert([
+                {team_id: data?.[0].rid,
+                user_id: session?.user.id,
+                role: 'Leader'}
+            ])
+        for(let memberInfo of member ){
+            await supabase
+            .from('team_members')
+            .insert([
+                {team_id: data?.[0].rid,
+                    user_id: memberInfo.id,
+                    role: 'Member'}
+            ])
+        }
 
+       
+        
         setIsOpen(false)
         if(data == null){
             return
         }
+        
         router.push(`/team/${data[0].rid}`)
         router.refresh()
+        }
+        catch (err){
+            console.log("insert error : ", err)
+        }
+        
         
 
             
     }
 
     return(
-        <div id="teams" className="mx-[200px] my-[50px] mt-[100px] p-[20px] bg-white rounded-lg">
+        <div id="teams" className={`mx-[200px] my-[50px] mt-[100px] p-[20px] bg-white rounded-lg ${notoSansKr.className}`}>
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
             <div className="flex">
                 
@@ -183,9 +218,9 @@ import { Session } from "@supabase/supabase-js";
                 {
                     member.map((elem, idx) => {
                         return(
-                           <Badge key={idx} variant="secondary">{elem.user_id}
+                           <Badge key={idx} variant="secondary">{elem.boj_handle}
                            <button type="button" className="ml-2" onClick={() => {
-                            setMember(member.filter((x) => x.user_id != elem.user_id)) 
+                            setMember(member.filter((x) => x.boj_handle != elem.boj_handle)) 
                            }}>X</button>
                            </Badge>
                         )
@@ -312,19 +347,7 @@ import { Session } from "@supabase/supabase-js";
                                 </div>
                     </div>
                         </Link>
-            //             <Link key={idx} href={"/team/" + elem.rid} className="my-8">
-            //     <Card className="w-50% mx-100 my-4">
-            //         <CardHeader>
-            //             <CardTitle>{elem.teamName}</CardTitle>
-            //             <CardDescription>@{elem.teamLeader} 아이콘 3명</CardDescription>
-            //             {/* <CardAction className="text-green-500">활성화</CardAction> */}
-            //         </CardHeader>
-            //         <CardContent>
-            //             <p>{elem.description}</p>
-            //         </CardContent>
-                    
-            //     </Card>
-            // </Link>
+                   
                     )
                 })
             }
