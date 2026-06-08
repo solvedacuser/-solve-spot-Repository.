@@ -24,7 +24,11 @@ function navLinkClass(isActive: boolean, isHomeTop: boolean) {
   ].join(" ");
 }
 
-export function SiteNav({ isAuthenticated, userEmail, displayName }: SiteNavProps) {
+export function SiteNav({
+  isAuthenticated,
+  userEmail,
+  displayName,
+}: SiteNavProps) {
   const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
   const identityLabel = displayName || userEmail || "account";
@@ -76,22 +80,49 @@ export function SiteNav({ isAuthenticated, userEmail, displayName }: SiteNavProp
               SLOVE SPOT
             </Link>
             <nav className="hidden flex-wrap items-center gap-2 md:flex">
-              <Link href="/" className={navLinkClass(pathname === "/", isHomeTop)}>
+              <Link
+                href="/"
+                className={navLinkClass(pathname === "/", isHomeTop)}
+              >
                 Home
               </Link>
-              <Link href="/record" className={navLinkClass(isRecordActive, isHomeTop)}>
+              <Link
+                href="/record"
+                className={navLinkClass(isRecordActive, isHomeTop)}
+              >
                 Records
               </Link>
-              <Link href="/api-check" className={navLinkClass(pathname === "/api-check", isHomeTop)}>
+              <Link
+                href="/mypage"
+                className={navLinkClass(pathname === "/mypage", isHomeTop)}
+              >
+                Dashboard
+              </Link>
+              <Link
+                href="/api-check"
+                className={navLinkClass(pathname === "/api-check", isHomeTop)}
+              >
                 API Check
               </Link>
-              <Link href="/leetcode-api" className={navLinkClass(pathname === "/leetcode-api", isHomeTop)}>
+              <Link
+                href="/leetcode-api"
+                className={navLinkClass(
+                  pathname === "/leetcode-api",
+                  isHomeTop,
+                )}
+              >
                 LeetCode API
               </Link>
-              <Link href="/teams" className={navLinkClass(pathname === "/teams", isHomeTop)}>
+              <Link
+                href="/teams"
+                className={navLinkClass(pathname === "/teams", isHomeTop)}
+              >
                 Teams
               </Link>
-              <Link href="/helper" className={navLinkClass(pathname === "/helper")}>
+              <Link
+                href="/helper"
+                className={navLinkClass(pathname === "/helper")}
+              >
                 Helper
               </Link>
             </nav>
@@ -103,7 +134,10 @@ export function SiteNav({ isAuthenticated, userEmail, displayName }: SiteNavProp
                 <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-600">
                   {identityLabel}
                 </span>
-                <Link href="/account" className={navLinkClass(pathname === "/account", isHomeTop)}>
+                <Link
+                  href="/account"
+                  className={navLinkClass(pathname === "/account", isHomeTop)}
+                >
                   Account
                 </Link>
                 <form action={logoutAction}>
@@ -117,16 +151,21 @@ export function SiteNav({ isAuthenticated, userEmail, displayName }: SiteNavProp
               </>
             ) : (
               <>
-                <Link href="/login" className={navLinkClass(pathname === "/login", isHomeTop)}>
+                <Link
+                  href="/login"
+                  className={navLinkClass(pathname === "/login", isHomeTop)}
+                >
                   Login
                 </Link>
                 <Link
                   href="/signup"
-                  className={pathname === "/signup"
-                    ? "rounded-full bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm"
-                    : isHomeTop
-                      ? "rounded-full border border-blue-200 bg-white/72 px-4 py-2 text-sm font-medium text-blue-700 transition hover:bg-white"
-                      : "rounded-full border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-medium text-blue-700 transition hover:bg-blue-100"}
+                  className={
+                    pathname === "/signup"
+                      ? "rounded-full bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm"
+                      : isHomeTop
+                        ? "rounded-full border border-blue-200 bg-white/72 px-4 py-2 text-sm font-medium text-blue-700 transition hover:bg-white"
+                        : "rounded-full border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-medium text-blue-700 transition hover:bg-blue-100"
+                  }
                 >
                   Sign up
                 </Link>
