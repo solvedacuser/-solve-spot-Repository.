@@ -91,6 +91,9 @@ export function SiteNav({ isAuthenticated, userEmail, displayName }: SiteNavProp
               <Link href="/teams" className={navLinkClass(pathname === "/teams", isHomeTop)}>
                 Teams
               </Link>
+              <Link href="/helper" className={navLinkClass(pathname === "/helper")}>
+                Helper
+              </Link>
             </nav>
           </div>
 

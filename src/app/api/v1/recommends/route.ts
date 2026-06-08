@@ -49,6 +49,7 @@ const tgs:any = {
 
 export async function POST(request : Request){
     const {tags, diff, count} = await request.json()
+    const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
     console.log("tags : ",tags, "diff : ", diff, "count : ", count)
     let diffParam:string = ""
     let tagParam = ""
@@ -76,6 +77,7 @@ export async function POST(request : Request){
     let max = res.totalQuestions - count
     const skipParam = max > 0 ? Math.floor(Math.random() *(max+1)) : 0
     console.log(skipParam)
+    await delay(500)
     response = await fetch(`https://alfa-leetcode-api.onrender.com/problems?difficulty=${diffParam}&skip=${skipParam}` + `${tagParam}&limit=${count}`)
     res = await response.json()
     if(res.count == 0) return NextResponse.json(null)
@@ -86,23 +88,29 @@ export async function POST(request : Request){
         return elem.titleSlug
     })
     for(let i = 0 ; i < titles.length ; i++){
-        const response = await fetch(`https://alfa-leetcode-api.onrender.com/select?titleSlug=${titles[i]}`)
-        const data = await response.json()
-        const item = {
-            "id": i,
-            "tags" : data.topicTags.map((elem:any) => elem.slug),
-            "time": "5:11",
-            "ratio": String((Math.random() * (5.7 - 2.1) + 2.1).toFixed(1)),
-            "title":  data.questionTitle,
-            "users": String(Math.floor(Math.random() * 2000) + 300),
-            "status": "pending",
-            "levelIcon": String(i),
-            "problemNum": "#" + data.questionId,
-            "titleSlug" : data.titleSlug,
-            "solved" : [],
-            "link" : data.link
-          }
-          responseArr.push(item)
+        try {
+            await delay(500)
+            const response = await fetch(`https://alfa-leetcode-api.onrender.com/select?titleSlug=${titles[i]}`)
+            const data = await response.json()
+            const item = {
+                "id": i,
+                "tags" : data.topicTags.map((elem:any) => elem.slug),
+                "time": "5:11",
+                "ratio": String((Math.random() * (5.7 - 2.1) + 2.1).toFixed(1)),
+                "title":  data.questionTitle,
+                "users": String(Math.floor(Math.random() * 2000) + 300),
+                "status": "pending",
+                "levelIcon": String(i),
+                "problemNum": "#" + data.questionId,
+                "titleSlug" : data.titleSlug,
+                "solved" : [],
+                "link" : data.link
+            }
+            responseArr.push(item)
+        }
+        catch(error) {
+            console.log(`[${titles[i]}] 파싱 에러:`, error)
+        }
         
     }
     

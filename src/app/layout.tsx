@@ -42,6 +42,12 @@ export default async function RootLayout({
 
   return (
     <html lang="ko" className={`${headingFont.variable} ${monoFont.variable}`}>
+      <head>
+      <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        />
+      </head>
       <body className="font-sans text-ink antialiased">
         <div className="noise-overlay" />
         <SiteNav
