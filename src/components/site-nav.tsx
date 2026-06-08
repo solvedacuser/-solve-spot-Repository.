@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import { logoutAction } from "@/app/auth/actions";
 
 type SiteNavProps = {
@@ -10,42 +11,84 @@ type SiteNavProps = {
   displayName?: string | null;
 };
 
-function navLinkClass(isActive: boolean) {
+function navLinkClass(isActive: boolean, isHomeTop: boolean) {
   return [
     "rounded-full px-4 py-2 text-sm font-medium transition",
     isActive
-      ? "bg-slate-950 text-white shadow-sm"
-      : "text-slate-600 hover:bg-slate-100 hover:text-slate-950",
+      ? isHomeTop
+        ? "text-blue-700"
+        : "bg-slate-950 text-white shadow-sm"
+      : isHomeTop
+        ? "text-slate-600 hover:bg-white/70 hover:text-slate-950"
+        : "text-slate-600 hover:bg-slate-100 hover:text-slate-950",
   ].join(" ");
 }
 
 export function SiteNav({ isAuthenticated, userEmail, displayName }: SiteNavProps) {
   const pathname = usePathname();
+  const [isScrolled, setIsScrolled] = useState(false);
   const identityLabel = displayName || userEmail || "account";
   const isRecordActive = pathname.startsWith("/record");
+  const isLanding = pathname === "/";
+  const isHomeTop = isLanding && !isScrolled;
+
+  useEffect(() => {
+    if (!isLanding) {
+      setIsScrolled(false);
+      return;
+    }
+
+    const handleScroll = () => setIsScrolled(window.scrollY > 12);
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [isLanding]);
 
   return (
-    <header className="sticky top-0 z-40 px-4 pt-4 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-7xl rounded-[28px] border border-white/60 bg-white/85 px-4 py-3 shadow-panel backdrop-blur">
+    <header
+      className={[
+        "top-0 z-40 w-full px-4 sm:px-6 lg:px-8",
+        isLanding ? "fixed py-0" : "sticky pt-4",
+      ].join(" ")}
+    >
+      <div
+        className={[
+          "mx-auto max-w-7xl transition-all duration-300",
+          isLanding
+            ? isScrolled
+              ? "mt-3 rounded-lg border border-slate-200/70 bg-white/82 px-4 py-3 shadow-sm backdrop-blur-xl"
+              : "border border-transparent bg-transparent px-0 py-5 shadow-none"
+            : "rounded-lg border border-white/60 bg-white/85 px-4 py-3 shadow-panel backdrop-blur",
+        ].join(" ")}
+      >
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <Link href="/" className="rounded-full bg-slate-950 px-4 py-2 text-sm font-semibold tracking-[0.2em] text-white">
+            <Link
+              href="/"
+              className={[
+                "rounded-full px-4 py-2 text-sm font-semibold tracking-[0.2em] transition",
+                isHomeTop
+                  ? "bg-slate-950 text-white"
+                  : "bg-slate-950 text-white shadow-sm",
+              ].join(" ")}
+            >
               SLOVE SPOT
             </Link>
-            <nav className="flex flex-wrap items-center gap-2">
-              <Link href="/" className={navLinkClass(pathname === "/")}>
+            <nav className="hidden flex-wrap items-center gap-2 md:flex">
+              <Link href="/" className={navLinkClass(pathname === "/", isHomeTop)}>
                 Home
               </Link>
-              <Link href="/record" className={navLinkClass(isRecordActive)}>
+              <Link href="/record" className={navLinkClass(isRecordActive, isHomeTop)}>
                 Records
               </Link>
-              <Link href="/api-check" className={navLinkClass(pathname === "/api-check")}>
+              <Link href="/api-check" className={navLinkClass(pathname === "/api-check", isHomeTop)}>
                 API Check
               </Link>
-              <Link href="/leetcode-api" className={navLinkClass(pathname === "/leetcode-api")}>
+              <Link href="/leetcode-api" className={navLinkClass(pathname === "/leetcode-api", isHomeTop)}>
                 LeetCode API
               </Link>
-              <Link href="/teams" className={navLinkClass(pathname === "/teams")}>
+              <Link href="/teams" className={navLinkClass(pathname === "/teams", isHomeTop)}>
                 Teams
               </Link>
               <Link href="/helper" className={navLinkClass(pathname === "/helper")}>
@@ -60,7 +103,7 @@ export function SiteNav({ isAuthenticated, userEmail, displayName }: SiteNavProp
                 <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-600">
                   {identityLabel}
                 </span>
-                <Link href="/account" className={navLinkClass(pathname === "/account")}>
+                <Link href="/account" className={navLinkClass(pathname === "/account", isHomeTop)}>
                   Account
                 </Link>
                 <form action={logoutAction}>
@@ -74,14 +117,16 @@ export function SiteNav({ isAuthenticated, userEmail, displayName }: SiteNavProp
               </>
             ) : (
               <>
-                <Link href="/login" className={navLinkClass(pathname === "/login")}>
+                <Link href="/login" className={navLinkClass(pathname === "/login", isHomeTop)}>
                   Login
                 </Link>
                 <Link
                   href="/signup"
                   className={pathname === "/signup"
-                    ? "rounded-full bg-orange-600 px-4 py-2 text-sm font-medium text-white shadow-sm"
-                    : "rounded-full border border-orange-200 bg-orange-50 px-4 py-2 text-sm font-medium text-orange-700 transition hover:bg-orange-100"}
+                    ? "rounded-full bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm"
+                    : isHomeTop
+                      ? "rounded-full border border-blue-200 bg-white/72 px-4 py-2 text-sm font-medium text-blue-700 transition hover:bg-white"
+                      : "rounded-full border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-medium text-blue-700 transition hover:bg-blue-100"}
                 >
                   Sign up
                 </Link>
