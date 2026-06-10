@@ -128,7 +128,7 @@ export default function DesktopSplitCodeChatUI() {
   
 
   const recommendedProblems: RecommendedProblem[] = [
-    { id: 'p1', title: '배열의 중복 요소 제거하기', difficulty: 'Easy', category: '추천 문제 #1' },
+    { id: 'p1', title: '배열의 중복 요소 제거하기', difficulty: 'Easy', category: 'Algorithm' },
     { id: 'p2', title: '정렬된 배열에서 이진 탐색 구현', difficulty: 'Medium', category: 'Algorithm' },
     { id: 'p3', title: 'React 커스텀 훅(useFetch) 작성', difficulty: 'Medium', category: 'React' },
   ];
