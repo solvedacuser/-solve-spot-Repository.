@@ -81,12 +81,6 @@ export function SiteNav({
             </Link>
             <nav className="hidden flex-wrap items-center gap-2 md:flex">
               <Link
-                href="/"
-                className={navLinkClass(pathname === "/", isHomeTop)}
-              >
-                Home
-              </Link>
-              <Link
                 href="/record"
                 className={navLinkClass(isRecordActive, isHomeTop)}
               >
@@ -121,7 +115,7 @@ export function SiteNav({
               </Link>
               <Link
                 href="/helper"
-                className={navLinkClass(pathname === "/helper")}
+                className={navLinkClass(pathname === "/helper", isHomeTop)}
               >
                 Helper
               </Link>
