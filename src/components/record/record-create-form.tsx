@@ -48,7 +48,9 @@ function Field({
         {label}
       </span>
       <div className="mt-2">{children}</div>
-      {hint ? <span className="mt-1.5 block text-xs text-slate-400">{hint}</span> : null}
+      {hint ? (
+        <span className="mt-1.5 block text-xs text-slate-400">{hint}</span>
+      ) : null}
     </label>
   );
 }
@@ -134,7 +136,9 @@ export function RecordCreateForm() {
       const data = (await response.json()) as { id?: string };
 
       if (!response.ok) {
-        setErrorMessage("풀이 기록을 저장하지 못했습니다. 입력값을 확인해주세요.");
+        setErrorMessage(
+          "풀이 기록을 저장하지 못했습니다. 입력값을 확인해주세요.",
+        );
         return;
       }
 
@@ -146,7 +150,9 @@ export function RecordCreateForm() {
       router.push(`/record/${data.id}/feedback`);
       router.refresh();
     } catch {
-      setErrorMessage("풀이 기록을 저장하지 못했습니다. 연결 상태를 확인한 뒤 다시 시도해주세요.");
+      setErrorMessage(
+        "풀이 기록을 저장하지 못했습니다. 연결 상태를 확인한 뒤 다시 시도해주세요.",
+      );
     } finally {
       setIsPending(false);
     }
@@ -156,7 +162,7 @@ export function RecordCreateForm() {
     <form className="space-y-6" onSubmit={handleSubmit}>
       <SectionCard className="p-5">
         <div className="mb-5">
-          <h2 className="text-xl font-bold text-slate-950">문제 정보</h2>
+          <h2 className="text-lg font-bold text-slate-950">문제 정보</h2>
           <p className="mt-1 text-sm text-slate-500">
             문제 이름과 기본 분류를 입력해주세요.
           </p>
@@ -164,23 +170,57 @@ export function RecordCreateForm() {
 
         <div className="grid gap-4 md:grid-cols-2">
           <Field label="문제 제목">
-            <input name="problemTitle" className={inputClass} placeholder="두 수의 합" type="text" required />
+            <input
+              name="problemTitle"
+              className={inputClass}
+              placeholder="두 수의 합"
+              type="text"
+              required
+            />
           </Field>
-          <Field label="문제 슬러그" hint="문제 URL에 쓰이는 슬러그를 입력해주세요.">
-            <input name="titleSlug" className={inputClass} placeholder="sample-problem" type="text" required />
+          <Field
+            label="문제 슬러그"
+            hint="문제 URL에 쓰이는 슬러그를 입력해주세요."
+          >
+            <input
+              name="titleSlug"
+              className={inputClass}
+              placeholder="sample-problem"
+              type="text"
+              required
+            />
           </Field>
           <Field label="난이도">
-            <select name="difficulty" className={selectClass} defaultValue="Easy" aria-label="난이도">
+            <select
+              name="difficulty"
+              className={selectClass}
+              defaultValue="Easy"
+              aria-label="난이도"
+            >
               <option value="Easy">쉬움</option>
               <option value="Medium">보통</option>
               <option value="Hard">어려움</option>
             </select>
           </Field>
           <Field label="언어">
-            <input name="language" className={inputClass} placeholder="TypeScript" type="text" required />
+            <input
+              name="language"
+              className={inputClass}
+              placeholder="TypeScript"
+              type="text"
+              required
+            />
           </Field>
-          <Field label="팀" hint="팀에 속하지 않는 기록이면 개인 기록으로 두세요.">
-            <select name="teamId" className={selectClass} defaultValue="" aria-label="팀">
+          <Field
+            label="팀"
+            hint="팀에 속하지 않는 기록이면 개인 기록으로 두세요."
+          >
+            <select
+              name="teamId"
+              className={selectClass}
+              defaultValue=""
+              aria-label="팀"
+            >
               <option value="">개인 기록</option>
               {teams.map((team) => (
                 <option key={team.id} value={team.id}>
@@ -191,7 +231,12 @@ export function RecordCreateForm() {
           </Field>
           <div className="md:col-span-2">
             <Field label="태그" hint="쉼표로 구분해서 입력해주세요.">
-              <input name="tags" className={inputClass} placeholder="Array, Hash Table" type="text" />
+              <input
+                name="tags"
+                className={inputClass}
+                placeholder="Array, Hash Table"
+                type="text"
+              />
             </Field>
           </div>
         </div>
@@ -199,7 +244,7 @@ export function RecordCreateForm() {
 
       <SectionCard className="p-5">
         <div className="mb-5">
-          <h2 className="text-xl font-bold text-slate-950">실행 정보</h2>
+          <h2 className="text-lg font-bold text-slate-950">실행 정보</h2>
           <p className="mt-1 text-sm text-slate-500">
             실행 시간과 메모리는 선택 입력이지만, 리뷰할 때 도움이 됩니다.
           </p>
@@ -207,13 +252,28 @@ export function RecordCreateForm() {
 
         <div className="grid gap-4 md:grid-cols-3">
           <Field label="실행 시간">
-            <input name="runtime" className={inputClass} placeholder="42ms" type="text" />
+            <input
+              name="runtime"
+              className={inputClass}
+              placeholder="42ms"
+              type="text"
+            />
           </Field>
           <Field label="메모리">
-            <input name="memory" className={inputClass} placeholder="16.2MB" type="text" />
+            <input
+              name="memory"
+              className={inputClass}
+              placeholder="16.2MB"
+              type="text"
+            />
           </Field>
           <Field label="상태">
-            <select name="status" className={selectClass} defaultValue="Review Requested" aria-label="상태">
+            <select
+              name="status"
+              className={selectClass}
+              defaultValue="Review Requested"
+              aria-label="상태"
+            >
               <option value="Review Requested">리뷰 요청</option>
               <option value="Verified">확인 완료</option>
               <option value="Draft">초안</option>
@@ -224,7 +284,7 @@ export function RecordCreateForm() {
 
       <SectionCard className="p-5">
         <div className="mb-5">
-          <h2 className="text-xl font-bold text-slate-950">풀이 코드</h2>
+          <h2 className="text-lg font-bold text-slate-950">풀이 코드</h2>
           <p className="mt-1 text-sm text-slate-500">
             리뷰받고 싶은 최종 풀이를 붙여넣어 주세요.
           </p>
@@ -243,7 +303,7 @@ export function RecordCreateForm() {
 
       <SectionCard className="p-5">
         <div className="mb-5">
-          <h2 className="text-xl font-bold text-slate-950">리뷰 메모</h2>
+          <h2 className="text-lg font-bold text-slate-950">리뷰 메모</h2>
           <p className="mt-1 text-sm text-slate-500">
             피드백을 받을 때 참고할 맥락이나 질문을 남겨주세요.
           </p>

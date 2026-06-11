@@ -17,7 +17,7 @@ export function SignupForm() {
         <p className="font-mono text-xs uppercase tracking-[0.3em] text-slate-500">
           Signup
         </p>
-        <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">
+        <h2 className="mt-2 text-xl font-semibold tracking-tight text-slate-950">
           이메일 회원가입
         </h2>
         <p className="mt-2 text-sm leading-6 text-slate-600">
@@ -82,11 +82,11 @@ export function SignupForm() {
           Leetcode username
         </span>
         <input
-          name="leetcodeUsername"
+          name="bojHandle"
           className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-orange-500 focus:ring-4 focus:ring-orange-100"
           placeholder="필수 입력"
         />
-        <FieldError message={state.fieldErrors.leetcodeUsername} />
+        <FieldError message={state.fieldErrors.bojHandle} />
       </label>
 
       <button

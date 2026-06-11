@@ -84,19 +84,19 @@ export default async function AccountPage() {
   const tagSkillStats = await getTagSkillStats(username);
 
   return (
-    <main className=" w-[100%] mx-auto mt-5 mb-28 sm:px-6 lg:px-8">
-      <div className="wrapper_title w-[100%]">
-        <div className="border-b-2 border-gray-200 my-8">
-          <div className="text-3xl font-semibold py-2">
+    <main className=" max-w-7xl mx-auto mt-5 mb-28 mx-auto">
+      <div className="wrapper_title mx-auto">
+        <div className="border-b-2 border-gray-200 my-8 mx-auto">
+          <div className="text-2xl font-semibold py-2">
             <span>내 정보</span>
           </div>
-          <div className="text-xl font-medium text-gray-500 py-2">
+          <div className="text-lg text-gray-500 py-2">
             <span>계정 정보를 확인하고 관리하세요.</span>
           </div>
         </div>
-        <div className="wrapper_info flex flex-row w-[100%]">
-          <div className="w-[30%]">
-            <div className="wrapper_userInfo flex flex-col border border-gray-100 rounded-xl mr-5 bg-white p-5">
+        <div className="wrapper_info flex flex-row w-[100%] gap-5">
+          <div className="w-[35%]">
+            <div className="wrapper_userInfo flex flex-col border border-gray-100 rounded-xl bg-white p-5">
               <div className="userAvatar flex justify-center">
                 <img
                   src={avatarUrl}
@@ -134,7 +134,7 @@ export default async function AccountPage() {
                     data={langStats.languages.map(
                       (item) => item.problemsSolved,
                     )}
-                    chartTitle="Languaage stats"
+                    chartTitle="Language stats"
                   ></BarChart>
                 </div>
               </div>

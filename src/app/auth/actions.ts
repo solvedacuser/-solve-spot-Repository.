@@ -50,7 +50,7 @@ export async function signupAction(
     email: getFormValue(formData, "email"),
     password: getFormValue(formData, "password"),
     displayName: getFormValue(formData, "displayName"),
-    leetcodeUsername: getFormValue(formData, "leetcodeUsername"),
+    leetcodeUsername: getFormValue(formData, "bojHandle"),
     bojHandle: getFormValue(formData, "bojHandle"),
   });
 
@@ -70,7 +70,7 @@ export async function signupAction(
       emailRedirectTo: redirectTo,
       data: {
         display_name: displayName,
-        leetcode_username: leetcodeUsername,
+        leetcode_username: bojHandle,
         // ...(leetcodeUsername ? { leetcode_username: leetcodeUsername } : {}),
         ...(bojHandle ? { boj_handle: bojHandle } : {}),
       },
@@ -156,7 +156,7 @@ export async function updateProfileAction(
     {
       id: user.id,
       display_name: parsed.data.displayName,
-      leetcode_username: parsed.data.leetcodeUsername,
+      leetcode_username: parsed.data.bojHandle,
       // ...(formData.has("leetcodeUsername")
       //   ? { leetcode_username: parsed.data.leetcodeUsername?.trim() ?? null }
       //   : {}),

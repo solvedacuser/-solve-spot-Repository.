@@ -77,9 +77,15 @@ export function SiteNav({
                   : "bg-slate-950 text-white shadow-sm",
               ].join(" ")}
             >
-              SLOVE SPOT
+              SOLVE SPOT
             </Link>
             <nav className="hidden flex-wrap items-center gap-2 md:flex">
+              <Link
+                href="/teams"
+                className={navLinkClass(pathname === "/teams", isHomeTop)}
+              >
+                Teams
+              </Link>
               <Link
                 href="/record"
                 className={navLinkClass(isRecordActive, isHomeTop)}
@@ -92,27 +98,7 @@ export function SiteNav({
               >
                 Dashboard
               </Link>
-              <Link
-                href="/api-check"
-                className={navLinkClass(pathname === "/api-check", isHomeTop)}
-              >
-                API Check
-              </Link>
-              <Link
-                href="/leetcode-api"
-                className={navLinkClass(
-                  pathname === "/leetcode-api",
-                  isHomeTop,
-                )}
-              >
-                LeetCode API
-              </Link>
-              <Link
-                href="/teams"
-                className={navLinkClass(pathname === "/teams", isHomeTop)}
-              >
-                Teams
-              </Link>
+
               <Link
                 href="/helper"
                 className={navLinkClass(pathname === "/helper", isHomeTop)}

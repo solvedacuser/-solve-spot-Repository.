@@ -24,7 +24,6 @@ import "react-tooltip/dist/react-tooltip.css";
 import { FaRegCheckCircle } from "react-icons/fa";
 import { BsFire } from "react-icons/bs";
 import { RiTeamLine } from "react-icons/ri";
-import { MdOutlineQuestionMark } from "react-icons/md";
 import { FiUserCheck } from "react-icons/fi";
 
 ChartJS.register(

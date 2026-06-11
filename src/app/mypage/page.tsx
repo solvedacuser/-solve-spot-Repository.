@@ -85,7 +85,7 @@ function calculateAttendaceRate(daysAttended: number, signup_at: Date) {
   return attendceRate;
 }
 
-export const dynamic = "force-dynamic";
+// export const dynamic = "force-dynamic";
 
 export default async function MyPage() {
   const supabase = await createClient();
@@ -133,7 +133,7 @@ export default async function MyPage() {
   const username: string = profile?.leetcode_username;
   const year: number = new Date().getFullYear();
   const totalTeams: number = teams?.length || 0;
-  const streak: number = (await getStreak(username, year.toString())) | 1;
+  const streak: number = (await getStreak(username, year.toString())) | 0;
   const numSolvedDailyLast7Days: number[] = calculateSolvedEachDayfor7days(
     solvedDateList,
   ) || [0, 0, 0, 0, 0, 0, 0];
@@ -176,7 +176,7 @@ export default async function MyPage() {
     new Date(profile?.signup_at),
   );
   return (
-    <div className="flex flex-col items-center mt-16 mb-28">
+    <div className="flex flex-col items-center mt-16 mb-28 max-w-8xl mx-auto">
       <div className="w-[80%] mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-4 sm:grid-cols-2 gap-8">
           <Card
@@ -198,7 +198,7 @@ export default async function MyPage() {
         </div>
       </div>
       <div className="w-[80%] h-[400px] flex flex-row mt-5">
-        <div className="w-[66%] h-[100%] mr-2 bg-white p-6 border-2 border-gray rounded-lg">
+        <div className="w-[66%] h-[100%] mr-2 bg-white p-6 border border-gray rounded-lg">
           <div className="flex items-center">
             <LuChartColumn className="inline-block w-5 h-5 text-blue-500 mr-2" />
             <span className="font-bold text-base md:text-lg">
@@ -212,7 +212,7 @@ export default async function MyPage() {
             chartTitle="최근 7일동안 해결한 문제 수"
           ></BarChart>
         </div>
-        <div className="w-[34%] h-[100%] bg-white ml-2 px-6 pt-6 pb-16 border-2 border-gray rounded-lg">
+        <div className="w-[34%] h-[100%] bg-white ml-2 px-6 pt-6 pb-16 border border-gray rounded-lg">
           <div className="flex items-center">
             <RiDonutChartLine className="inline-block w-6 h-6 text-orange-500 mr-2" />
             <span className="font-bold text-base md:text-lg">
@@ -232,15 +232,18 @@ export default async function MyPage() {
           ) : (
             <div className="flex flex-col w-full h-full items-center justify-center">
               <div className="flex w-full items-center justify-center py-5">
-                <p className="inline-block text-lg md:text-xl text-center">
+                <p className="inline-block text-base md:text-lg text-center text-gray-500">
                   현재 학습 기록이 없습니다.
                   <br />
                   학습 여정을 지금 시작하세요.
                 </p>
               </div>
-              <div className="border border-slate-400 py-2 px-10 rounded-lg hover:text-orange-600">
+              <div className="border border-slate-400 py-1 px-10 rounded-lg hover:text-orange-600">
                 <TbBulb className="inline-block w-6 h-6 mr-3" />
-                <Link href={"./teams"} className="text-lg text-black">
+                <Link
+                  href={"./teams"}
+                  className="text-sm md:text-base text-slate-700"
+                >
                   시작하기
                 </Link>
               </div>
@@ -264,7 +267,7 @@ export default async function MyPage() {
         </div>
       </div>
       <div className="w-full">
-        <div className="mx-auto w-[80%] mt-5 bg-white p-5 border-2 border-gray rounded-lg">
+        <div className="mx-auto w-[80%] mt-5 bg-white p-5 border-gray rounded-lg">
           <div className="flex items-center mb-8">
             <LuCalendarCheck className="inline-block w-6 h-6 mr-2 text-red-500" />
             <span className="font-semibold text-base md:text-lg">

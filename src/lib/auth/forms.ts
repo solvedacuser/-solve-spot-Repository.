@@ -2,7 +2,10 @@ import { z } from "zod";
 import { usernameSchema as leetCodeUsernameSchema } from "@/lib/leetcode/schemas";
 
 export type AuthFieldErrors = Partial<
-  Record<"email" | "password" | "displayName" | "leetcodeUsername" | "bojHandle", string>
+  Record<
+    "email" | "password" | "displayName" | "leetcodeUsername" | "bojHandle",
+    string
+  >
 >;
 
 export type AuthActionState = {
@@ -34,40 +37,43 @@ const displayNameSchema = z
   .min(1, "이름을 입력해주세요.")
   .max(40, "이름은 40자 이하여야 합니다.");
 
-const optionalBojHandleSchema = z.preprocess(
-  (value) => {
-    if (typeof value !== "string") {
-      return value;
-    }
+const bojHandleSchema = z
+  .string()
+  .trim()
+  .min(1, "Leetcode username을 입력해주세요.")
+  .max(20, "Leetcode username은 20자 이하여야 합니다.");
 
-    const trimmed = value.trim();
-    return trimmed === "" ? undefined : trimmed;
-  },
-  z
-    .string()
-    .max(100, "BOJ handle 길이가 너무 깁니다.")
-    .regex(/^[A-Za-z0-9_.-]+$/, "BOJ handle 형식이 올바르지 않습니다.")
-    .optional(),
-);
+// const optionalBojHandleSchema = z.preprocess(
+//   (value) => {
+//     if (typeof value !== "string") {
+//       return value;
+//     }
 
-const optionalLeetCodeUsernameSchema = z.preprocess(
-  (value) => {
-    if (typeof value !== "string") {
-      return value;
-    }
+//     const trimmed = value.trim();
+//     return trimmed === "" ? undefined : trimmed;
+//   },
+//   z
+//     .string()
+//     .max(100, "BOJ handle 길이가 너무 깁니다.")
+//     .regex(/^[A-Za-z0-9_.-]+$/, "BOJ handle 형식이 올바르지 않습니다.")
+//     .optional(),
+// );
 
-    const trimmed = value.trim();
-    return trimmed === "" ? undefined : trimmed;
-  },
-  leetCodeUsernameSchema.optional(),
-);
+const optionalLeetCodeUsernameSchema = z.preprocess((value) => {
+  if (typeof value !== "string") {
+    return value;
+  }
+
+  const trimmed = value.trim();
+  return trimmed === "" ? undefined : trimmed;
+}, leetCodeUsernameSchema.optional());
 
 export const signupSchema = z.object({
   email: emailSchema,
   password: passwordSchema,
   displayName: displayNameSchema,
   leetcodeUsername: optionalLeetCodeUsernameSchema,
-  bojHandle: optionalBojHandleSchema,
+  bojHandle: bojHandleSchema,
 });
 
 export const loginSchema = z.object({
@@ -78,7 +84,7 @@ export const loginSchema = z.object({
 export const profileSchema = z.object({
   displayName: displayNameSchema,
   leetcodeUsername: optionalLeetCodeUsernameSchema,
-  bojHandle: optionalBojHandleSchema,
+  bojHandle: bojHandleSchema,
 });
 
 export function getFieldErrors(error: z.ZodError): AuthFieldErrors {
@@ -105,7 +111,10 @@ type SupabaseErrorLike = {
   message?: string | null;
 };
 
-export function getAuthErrorMessage(error: SupabaseErrorLike | null | undefined, context: AuthContext) {
+export function getAuthErrorMessage(
+  error: SupabaseErrorLike | null | undefined,
+  context: AuthContext,
+) {
   const message = error?.message?.toLowerCase() ?? "";
 
   if (context === "signup") {
@@ -128,7 +137,10 @@ export function getAuthErrorMessage(error: SupabaseErrorLike | null | undefined,
     return "로그인을 완료하지 못했습니다. 잠시 후 다시 시도해주세요.";
   }
 
-  if (message.includes("profiles_leetcode_username_key") || message.includes("leetcode_username")) {
+  if (
+    message.includes("profiles_leetcode_username_key") ||
+    message.includes("leetcode_username")
+  ) {
     return "This LeetCode username is already in use.";
   }
 

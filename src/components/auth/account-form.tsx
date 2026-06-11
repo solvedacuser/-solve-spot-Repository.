@@ -29,7 +29,7 @@ export function AccountForm({
     <form action={formAction} className="space-y-5">
       <label className="flex flex-col">
         <div className="flex flex-row">
-          <span className="inline-block my-auto md:w-[20%] text-sm font-medium text-slate-700">
+          <span className="inline-block my-auto md:w-[30%] text-sm font-medium text-slate-700">
             이름
           </span>
           <input
@@ -46,8 +46,9 @@ export function AccountForm({
 
       <label className="flex flex-col">
         <div className="flex flex-row">
-          <span className="inline-block my-auto md:w-[20%] text-sm font-medium text-slate-700">
-            Leetcode Username
+          <span className="inline-block my-auto md:w-[30%] text-xs lg:text-sm font-medium text-slate-700">
+            Leetcode
+            <br className="hidden md:block" /> Username
           </span>
           <input
             name="leetcodeUsername"
@@ -62,7 +63,7 @@ export function AccountForm({
       </label>
 
       <label className="flex flex-row">
-        <span className="inline-block my-auto md:w-[20%] mr-2 block text-sm font-medium text-slate-700">
+        <span className="inline-block my-auto md:w-[30%] block text-sm font-medium text-slate-700">
           이메일
         </span>
         <input
@@ -74,7 +75,7 @@ export function AccountForm({
       </label>
 
       <label className="flex flex-row">
-        <span className="inline-block my-auto md:w-[20%] mr-2 block text-sm font-medium text-slate-700">
+        <span className="inline-block my-auto md:w-[30%] block text-sm font-medium text-slate-700">
           가입일
         </span>
         <input
@@ -86,7 +87,7 @@ export function AccountForm({
       </label>
 
       <label className="flex flex-row">
-        <span className="inline-block my-auto md:w-[20%] mr-2 block text-sm font-medium text-slate-700">
+        <span className="inline-block my-auto md:w-[30%] block text-sm font-medium text-slate-700">
           ranking
         </span>
         <input
@@ -97,7 +98,7 @@ export function AccountForm({
         />
       </label>
       <label className="flex flex-row">
-        <span className="inline-block my-auto md:w-[20%] mr-2 block text-sm font-medium text-slate-700">
+        <span className="inline-block my-auto md:w-[30%] block text-sm font-medium text-slate-700">
           reputation
         </span>
         <input
@@ -110,7 +111,7 @@ export function AccountForm({
       <div className="flex">
         <button
           type="submit"
-          className="ml-auto rounded-full bg-teal-700 px-5 py-3 text-sm font-semibold text-white transition hover:bg-teal-800 disabled:opacity-60"
+          className="ml-auto rounded-full bg-teal-700 px-5 py-3 text-xs font-semibold text-white transition hover:bg-teal-800 disabled:opacity-60"
           disabled={isPending}
         >
           {isPending ? "저장 중..." : "프로필 저장"}

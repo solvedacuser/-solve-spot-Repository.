@@ -47,7 +47,7 @@ export default function NewRecordPage() {
             <p className="mt-5 text-xs font-semibold uppercase tracking-[0.24em] text-teal-700">
               풀이 관리
             </p>
-            <h1 className="mt-3 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">
+            <h1 className="mt-3 text-xl font-bold tracking-tight text-slate-950 sm:text-2xl">
               새 풀이 기록
             </h1>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
@@ -69,16 +69,21 @@ export default function NewRecordPage() {
                   <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-teal-50 text-xs font-bold text-teal-700">
                     {index + 1}
                   </span>
-                  <span className="text-sm font-semibold text-slate-700">{item}</span>
+                  <span className="text-sm font-semibold text-slate-700">
+                    {item}
+                  </span>
                 </div>
               ))}
             </div>
           </SectionCard>
 
           <SectionCard className="p-5">
-            <h2 className="text-base font-bold text-slate-950">현재 동작 범위</h2>
+            <h2 className="text-base font-bold text-slate-950">
+              현재 동작 범위
+            </h2>
             <p className="mt-2 text-sm leading-6 text-slate-500">
-              이 폼은 Supabase에 풀이 기록을 저장합니다. LeetCode 검증과 팀 공유는 이후에 연결할 예정입니다.
+              이 폼은 Supabase에 풀이 기록을 저장합니다. LeetCode 검증과 팀
+              공유는 이후에 연결할 예정입니다.
             </p>
           </SectionCard>
         </aside>
