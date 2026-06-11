@@ -53,6 +53,7 @@ import { Session } from "@supabase/supabase-js";
     const [member, setMember] = useState<any[]>([])
     const [isOpen, setIsOpen] = useState(false)
     const [session, setSession] = useState<Session | null>(null)
+    const [expandedTeams, setExpandedTeams] = useState<Record<string, boolean>>({})
     const [supabase] = useState(() => createClient()) 
     const { toast } = useToast()
     const router = useRouter()
@@ -85,6 +86,7 @@ import { Session } from "@supabase/supabase-js";
         console.log("data :", team)
     }
 
+
     const getUser = async() => {
             let { data: user, error } = await supabase
             .from('profiles')
@@ -105,6 +107,13 @@ import { Session } from "@supabase/supabase-js";
                   })
             }
     }              
+    const toggleExpand = (e: React.MouseEvent, teamId: string) => {
+        e.preventDefault(); 
+        setExpandedTeams((prev) => ({
+            ...prev,
+            [teamId]: !prev[teamId]
+        }))
+    }
 
 
     const submitHandler = async() => {
@@ -165,9 +174,29 @@ import { Session } from "@supabase/supabase-js";
     }
 
     return(
-        <div id="teams" className={`mx-[200px] my-[50px] mt-[100px] p-[20px] bg-white rounded-lg ${notoSansKr.className}`}>
+        <div id="teams" className={`mx-[200px] my-[50px] mt-[100px] p-[20px]  rounded-lg ${notoSansKr.className}`}>
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
-            <div className="flex">
+            <div className="flex items-end justify-between mb-8 pb-6 border-b border-gray-100">
+        <div>
+          <h3 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+            {/* <i className="fa-solid fa-layer-group text-[#4F6EF7]"></i> */}
+            {/* <i className="fa-solid fa-list text-[#4F6EF7]" ></i> */}
+            
+            스터디 참여 현황 
+          </h3>
+          <p className="text-[14px] text-gray-500 mt-2">
+            함께 알고리즘 문제를 풀고 성장할 스터디 팀을 만들고 관리해보세요.
+          </p>
+          <div className="flex gap-2 mt-4">
+            <Badge variant="secondary" className="bg-white text-[#4F6EF7] hover:bg-white border-none px-3 py-1">
+              <i className="fa-solid fa-users mr-[6px]"></i> 참여 중인 팀 {teams?.length || 0}개
+            </Badge>
+            <Badge variant="outline" className="bg-white text-gray-500 px-3 py-1">
+              <i className="fa-solid fa-circle-check text-[#22c95f] mr-[6px]"></i> 전체 활성화 됨
+            </Badge>
+          </div>
+        </div>
+                
                 
                 <Dialog open={isOpen} onOpenChange={(open) => {
                     
@@ -175,7 +204,7 @@ import { Session } from "@supabase/supabase-js";
                     if(!open) setMember([])
                     }}>
                 
-                <Button className="mt-5 ml-auto" variant="outline" onClick={(e) => {
+                <Button className=" ml-auto" variant="outline" onClick={(e) => {
                     if(!session){
                         router.push("/login")
                         return
@@ -245,7 +274,10 @@ import { Session } from "@supabase/supabase-js";
             </div>
             {
                 teams?.map((elem, idx) => {
+                    const isExpanded = expandedTeams[elem.rid] || false;
                     return(
+                        
+                        
                         <Link key={idx} href={"/team/" + elem.rid} className="my-8">
                             <div className="bg-white rounded-2xl p-5 border border-gray-200 relative my-[10px]">
                         <div className="flex justify-between">
@@ -298,16 +330,21 @@ import { Session } from "@supabase/supabase-js";
                                         
                                             
                                     </div>
-                                    <div><button className="flex items-center gap-[5px] mt-[2px] py-[5px] px-3 rounded-md border border-gray-200 bg-white text-[12px] font-semibold text-gray-500">
-                                        <i className= "fa-solid fa-chevron-down text-[10px]"  />
+                                    <div>
+                                        <button 
+                                        onClick={(e) => toggleExpand(e, elem.rid)}
+                                        className="flex items-center gap-[5px] mt-[2px] py-[5px] px-3 rounded-md border border-gray-200 bg-white text-[12px] font-semibold text-gray-500"
+                                    >
+                                        <i className={`fa-solid fa-chevron-${isExpanded ? 'up' : 'down'} text-[10px]`} />
                                         팀원 상세보기
-                                        </button></div>
+                                        </button>
+                                    </div>
                                     {/* <div>sdf</div> */}
                                             
                                 </div>
                                 
                                 {/* 팀원 목록 */}
-                                <div className="extended mt-[14px] pt-[14px] border-t border-gray-200 hidden " >
+                                <div className={`extended mt-[14px] pt-[14px] border-t border-gray-200 ${isExpanded ? 'block' : 'hidden'}`} >
                                     <div className="text-[11px] text-gray-400 font-medium py-[8px] pb-1 flex items-center gap-[5px]">
                                         <i className="fa-solid fa-users" />
                                         팀원 목록
@@ -316,7 +353,7 @@ import { Session } from "@supabase/supabase-js";
                                     <div className="flex items-center gap-2 py-[7px] border-b border-slate-100">
                                         <div className="w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-bold text-white border-2 border-white bg-blue-500">K</div>
                                             <div className="flex-1">
-                                                <div className="text-[12px] font-bold" >@Kim_back
+                                                <div className="text-[12px] font-bold" >@{elem.teamLeader}
                                                     <span className="ml-[5px] text-[9px] bg-amber-50 text-amber-800 rounded-[3px] px-[5px] py-px font-semibold">
                                                     <i className="fa-solid fa-crown mr-[2px] text-[8px]"  />
                                                     팀장
@@ -330,19 +367,24 @@ import { Session } from "@supabase/supabase-js";
                                         
                                     </div>
                                     {/* 팀원 표현 */}
-                                    <div className="flex items-center gap-2 py-[7px] border-b border-slate-100">
-                                        <div className="w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-bold text-white border-2 border-white bg-blue-500">K</div>
-                                            <div className="flex-1">
-                                                <div className="text-[12px] font-bold" >@Kim_back
+                                    {
+                                        elem.UserList.map((member:any, idx:number) => {
+                                            return(<div key={idx} className="flex items-center gap-2 py-[7px] border-b border-slate-100">
+                                                <div className="w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-bold text-white border-2 border-white bg-blue-500">K</div>
+                                                    <div className="flex-1">
+                                                        <div className="text-[12px] font-bold" >@{member.boj_handle}
+                                                            
+        
+                                                        </div>
+                                                        <div className="text-[10px] text-[#9ca3af] ">팀원</div>
+                                                    </div>
                                                     
-
-                                                </div>
-                                                <div className="text-[10px] text-[#9ca3af] ">팀원</div>
-                                            </div>
-                                            
-                                            <span className="px-2 py-[2px] rounded text-[11px] font-medium bg-gray-50 text-gray-500">팀원</span>
-                                        
-                                    </div>
+                                                    <span className="px-2 py-[2px] rounded text-[11px] font-medium bg-gray-50 text-gray-500">팀원</span>
+                                                
+                                            </div>)
+                                        })
+                                    }
+                                    
                                     
                                 </div>
                     </div>
