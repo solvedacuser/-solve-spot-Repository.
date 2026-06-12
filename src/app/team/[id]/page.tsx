@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 
 import { ResponsiveContainer, PieChart, Pie } from "recharts";
-
+import { useToast } from "@/hooks/use-toast"
 import { Noto_Sans_KR } from "next/font/google";
 
 const notoSansKr = Noto_Sans_KR({
@@ -107,9 +107,9 @@ function TeamProgress({ data }: { data: any[] }) {
 
                 {/* 팀원별 상태 */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                  {prob.members.map((member: any) => (
+                  {prob.members.map((member: any, idx:any) => (
                     <div
-                      key={member.id}
+                      key={`${member.id}-${idx}`}
                       className={`flex items-center gap-2.5 p-2 rounded-lg border transition-all
                                 ${
                                   member.status === "completed"
@@ -323,12 +323,101 @@ function StudySessionStats({ data }: { data: any }) {
 export default function AlgorithmDashboard() {
   const params = useParams();
   const teamId = params.id;
-
+  const { toast } = useToast()
   const [supabase] = useState(() => createClient());
   const [teamInfo, setTeamInfo] = useState<any>("");
   const [teamMembers, setTeamMembers] = useState<any>([]);
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState("");
+  const [isInviteOpen, setIsInviteOpen] = useState(false);
+  const [inviteInput, setInviteInput] = useState("");
+  const [isCheckingId, setIsCheckingId] = useState(false);
+  const [invitedList, setInvitedList] = useState<string[]>([]);
+  const [invitedProfiles, setInvitedProfiles] = useState<any>([])
+  
+const handleCheckInviteId = async() => {
+  const trimmedId = inviteInput.trim();
+  if (!trimmedId) return;
+
+  if (invitedList.includes(trimmedId)) {
+    alert("이미 추가된 아이디입니다.");
+    return;
+  }
+  setIsCheckingId(true);
+
+  let { data: profiles, error } = await supabase
+  .from('profiles')
+  .select("*")
+  .eq('boj_handle', inviteInput)
+  .maybeSingle()
+  if(profiles){
+    console.log("there is detected user")
+    setInvitedProfiles((prev:any) => [...prev, profiles])
+    console.log("invited profiles", invitedProfiles)
+    setIsCheckingId(false);
+    setInvitedList((prev) => [...prev, trimmedId]);
+    setInviteInput(""); 
+  }
+  else{
+    console.log("there is no detected user")
+    setIsCheckingId(false);
+    setInviteInput("");
+  }
+
+  
+ 
+};
+
+
+const handleRemoveInvitedId = (idToRemove: string) => {
+  setInvitedList((prev) => prev.filter((id) => id !== idToRemove));
+};
+
+
+const handleInviteSubmit = async() => {
+  if (invitedList.length === 0) {
+    alert("초대할 아이디를 최소 하나 이상 등록해 주세요.");
+    return;
+  }
+  let { data: team, error:fetchError } = await supabase
+  .from('team')
+  .select("*")
+  .eq('rid', teamId)
+  .single()
+  if(fetchError){
+    console.log("fetchError")
+    alert(fetchError)
+  }
+
+  const updateList = [...team.UserList, ...invitedProfiles]
+
+  const { data, error:updateError } = await supabase
+  .from('team')
+  .update({ UserList: updateList })
+  .eq('rid', teamId)
+  if(updateError){
+    console.log("fetchError")
+    alert(updateError)
+  }
+  let memberList = invitedProfiles.map((elem:any) => ({team_id: teamId, user_id: elem.id, role: 'Member'}))
+  console.log("memberList" , memberList)
+  const { data:team_members, error:memberError } = await supabase
+  .from('team_members')
+  .insert(memberList)
+  if(memberError){
+    console.log("memberError")
+    alert(memberError)
+  }
+  
+  
+  
+  toast({
+    title: "초대를 성공하였습니다",
+    description: "해당 사용자들을 현재 스터디 팀에 초대합니다!",
+  })
+  setInvitedList([]);
+  setIsInviteOpen(false);
+};
   useEffect(() => {
     const getSession = async () => {
       const { data } = await supabase.auth.getSession();
@@ -601,11 +690,22 @@ export default function AlgorithmDashboard() {
         tags: selectedTags,
       }),
     });
+    if (!response.ok) {
+      const errorData = await response.json();
+      alert(errorData.error || "문제를 가져오는 중 오류가 발생했습니다.");
+      setIsLoadingMissions(false); 
+      return;
+    }
     const res = await response.json();
     if (res == null) {
       //toaster 생성
       //   toast.warning("스터디 생성 실패: 해당하는 문제를 찾을 수 없습니다" , { position: "bottom-right" } )
+      alert("해당하는 문제를 찾을 수 없습니다")
+      setIsLoadingMissions(false)
       return;
+    }
+    if(res.status == 429){
+      alert(res.error)
     }
 
     console.log(res);
@@ -737,10 +837,13 @@ export default function AlgorithmDashboard() {
             <p className="text-gray-500 text-sm">{teamInfo.description}</p>
           </div>
           <div className="flex items-center gap-3">
-            <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center gap-2 text-sm font-medium transition-colors">
-              <UserPlus size={16} />
-              멤버 초대
-            </button>
+          <button 
+            onClick={() => setIsInviteOpen(true)} // 클릭 시 모달 오픈 구문 추가
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center gap-2 text-sm font-medium transition-colors"
+          >
+            <UserPlus size={16} />
+            멤버 초대
+          </button>
             <button className="text-gray-400 hover:text-gray-600">
               <MoreVertical size={20} />
             </button>
@@ -1039,9 +1142,13 @@ export default function AlgorithmDashboard() {
                       <span className="bg-yellow-50 text-yellow-600 px-2 py-0.5 rounded text-xs font-semibold">
                         Medium
                       </span>
-                    ) : (
+                    ) : missionInfo?.[0]?.difficulty == "Hard" ? (
                       <span className="bg-[#fef2f2] text-[#dc2626] px-2 py-0.5 rounded text-xs font-semibold">
                         Hard
+                      </span>
+                    ) : (
+                      <span className="bg-gray-400 text-white px-2 py-0.5 rounded text-xs font-semibold">
+                        None
                       </span>
                     )}
                   </div>
@@ -1338,6 +1445,120 @@ export default function AlgorithmDashboard() {
           </div>
         </div>
       )}
+    {/* 멤버 초대 모달 */}
+    {isInviteOpen && (
+      <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4 backdrop-blur-sm transition-opacity">
+        <div className="bg-white rounded-2xl w-full max-w-[460px] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+          
+          <div className="flex justify-between items-center p-5 border-b border-gray-100 shrink-0">
+            <div className="flex items-center gap-2">
+              <UserPlus className="text-blue-600" size={20} />
+              <h2 className="text-lg font-bold text-gray-800">멤버 초대</h2>
+            </div>
+            <button
+              onClick={() => {
+                if(!isCheckingId) {
+                  setIsInviteOpen(false);
+                  setInvitedList([]);
+                  setInviteInput("");
+                }
+              }}
+              disabled={isCheckingId}
+              className="text-gray-400 hover:text-gray-600 transition-colors p-1 disabled:opacity-50"
+            >
+              <X size={20} />
+            </button>
+          </div>
+
+          
+          <div className="p-6 space-y-5 overflow-y-auto">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                초대할 유저 아이디 <span className="text-red-500">*</span>
+              </label>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={inviteInput}
+                  onChange={(e) => setInviteInput(e.target.value)}
+                  disabled={isCheckingId}
+                  placeholder="백준 또는 초대할 아이디 입력"
+                  className="flex-1 px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all disabled:opacity-60"
+                />
+                <button
+                  type="button"
+                  onClick={handleCheckInviteId}
+                  disabled={isCheckingId || !inviteInput.trim()}
+                  className="px-4 py-2 bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 text-white text-sm font-semibold rounded-lg transition-colors flex items-center justify-center min-w-[70px]"
+                >
+                  {isCheckingId ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    "확인"
+                  )}
+                </button>
+              </div>
+              {isCheckingId && (
+                <p className="text-xs text-blue-500 mt-1.5 flex items-center gap-1">
+                  <Loader2 className="w-3 h-3 animate-spin" /> 존재 여부를 확인하고 있습니다...
+                </p>
+              )}
+            </div>
+
+            
+            <div>
+              <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
+                초대 대상 유저 ({invitedList.length})
+              </label>
+              <div className="flex flex-wrap gap-2 p-3 bg-gray-50 border border-gray-100 rounded-xl min-h-[60px]">
+                {invitedList.length === 0 ? (
+                  <span className="text-xs text-gray-400 self-center mx-auto">
+                    추가된 아이디가 없습니다. 상단에서 확인 버튼을 눌러주세요.
+                  </span>
+                ) : (
+                  invitedList.map((id) => (
+                    <span
+                      key={id}
+                      className="flex items-center gap-1.5 bg-blue-50 text-blue-700 text-xs px-2.5 py-1.5 rounded-md font-medium border border-blue-100 transition-all"
+                    >
+                      {id}
+                      <button
+                        onClick={() => handleRemoveInvitedId(id)}
+                        className="text-blue-400 hover:text-blue-800 focus:outline-none"
+                      >
+                        <X size={12} strokeWidth={3} />
+                      </button>
+                    </span>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
+
+          
+          <div className="flex gap-2 p-5 border-t border-gray-100 bg-white shrink-0">
+            <button
+              onClick={() => {
+                setIsInviteOpen(false);
+                setInvitedList([]);
+                setInviteInput("");
+              }}
+              disabled={isCheckingId}
+              className="px-5 py-2.5 rounded-xl font-bold text-sm text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 transition-colors disabled:opacity-50"
+            >
+              취소
+            </button>
+            <button
+              onClick={handleInviteSubmit}
+              disabled={isCheckingId || invitedList.length === 0}
+              className="flex-1 py-2.5 rounded-xl font-bold text-sm text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors shadow-sm flex items-center justify-center gap-1"
+            >
+              <Check size={16} strokeWidth={3} /> 최종 제출
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
     </div>
   );
 }

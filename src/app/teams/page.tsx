@@ -70,6 +70,7 @@ import { Session } from "@supabase/supabase-js";
         let { data: team, error } = await supabase
         .from('team')
         .select('*')
+        .order("createdAt", { ascending: false })
         setTeam(team)
         console.log("teams", team)
         if(error)
@@ -370,7 +371,7 @@ import { Session } from "@supabase/supabase-js";
                                     {
                                         elem.UserList.map((member:any, idx:number) => {
                                             return(<div key={idx} className="flex items-center gap-2 py-[7px] border-b border-slate-100">
-                                                <div className="w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-bold text-white border-2 border-white bg-blue-500">K</div>
+                                                <div className="w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-bold text-white border-2 border-white bg-gray-300">{member.boj_handle[0].toUpperCase()}</div>
                                                     <div className="flex-1">
                                                         <div className="text-[12px] font-bold" >@{member.boj_handle}
                                                             
