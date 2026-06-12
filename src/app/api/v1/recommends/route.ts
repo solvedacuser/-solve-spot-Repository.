@@ -72,12 +72,17 @@ export async function POST(request : Request){
         console.log("tags length is 0")
     }
     let response = await fetch(`https://alfa-leetcode-api.onrender.com/problems?difficulty=${diffParam}` + `${tagParam}`)
+    if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`[Error] 2차 Fetch 실패. Status: ${response.status}, Message: ${errorText}`);
+        return NextResponse.json({ error: "API 서버 요청 한도를 초과했거나 문제가 발생했습니다." }, { status: response.status });
+    }
     let res = await response.json()
     console.log("status", response.status)
     let max = res.totalQuestions - count
     const skipParam = max > 0 ? Math.floor(Math.random() *(max+1)) : 0
     console.log(skipParam)
-    await delay(500)
+    await delay(1000)
     response = await fetch(`https://alfa-leetcode-api.onrender.com/problems?difficulty=${diffParam}&skip=${skipParam}` + `${tagParam}&limit=${count}`)
     res = await response.json()
     if(res.count == 0) return NextResponse.json(null)
