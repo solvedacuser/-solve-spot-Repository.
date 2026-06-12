@@ -21,13 +21,20 @@ function getFormValue(formData: FormData, field: string) {
 async function getRequestOrigin() {
   const headerList = await headers();
   const protocol =
-    headerList.get("x-forwarded-proto") ?? (process.env.NODE_ENV === "development" ? "http" : "https");
-  const host = headerList.get("x-forwarded-host") ?? headerList.get("host") ?? "localhost:3000";
+    headerList.get("x-forwarded-proto") ??
+    (process.env.NODE_ENV === "development" ? "http" : "https");
+  const host =
+    headerList.get("x-forwarded-host") ??
+    headerList.get("host") ??
+    "localhost:3000";
 
   return `${protocol}://${host}`;
 }
 
-function withError(fieldErrors: AuthActionState["fieldErrors"], message: string): AuthActionState {
+function withError(
+  fieldErrors: AuthActionState["fieldErrors"],
+  message: string,
+): AuthActionState {
   return {
     status: "error",
     message,
@@ -35,12 +42,15 @@ function withError(fieldErrors: AuthActionState["fieldErrors"], message: string)
   };
 }
 
-export async function signupAction(_: AuthActionState, formData: FormData): Promise<AuthActionState> {
+export async function signupAction(
+  _: AuthActionState,
+  formData: FormData,
+): Promise<AuthActionState> {
   const parsed = signupSchema.safeParse({
     email: getFormValue(formData, "email"),
     password: getFormValue(formData, "password"),
     displayName: getFormValue(formData, "displayName"),
-    leetcodeUsername: getFormValue(formData, "leetcodeUsername"),
+    leetcodeUsername: getFormValue(formData, "bojHandle"),
     bojHandle: getFormValue(formData, "bojHandle"),
   });
 
@@ -50,7 +60,8 @@ export async function signupAction(_: AuthActionState, formData: FormData): Prom
 
   const supabase = await createClient();
   const redirectTo = `${await getRequestOrigin()}/auth/confirm`;
-  const { email, password, displayName, leetcodeUsername, bojHandle } = parsed.data;
+  const { email, password, displayName, leetcodeUsername, bojHandle } =
+    parsed.data;
 
   const { data, error } = await supabase.auth.signUp({
     email,
@@ -59,7 +70,8 @@ export async function signupAction(_: AuthActionState, formData: FormData): Prom
       emailRedirectTo: redirectTo,
       data: {
         display_name: displayName,
-        ...(leetcodeUsername ? { leetcode_username: leetcodeUsername } : {}),
+        leetcode_username: bojHandle,
+        // ...(leetcodeUsername ? { leetcode_username: leetcodeUsername } : {}),
         ...(bojHandle ? { boj_handle: bojHandle } : {}),
       },
     },
@@ -70,7 +82,10 @@ export async function signupAction(_: AuthActionState, formData: FormData): Prom
   }
 
   if (!data.user) {
-    return withError({}, "회원가입을 완료하지 못했습니다. 잠시 후 다시 시도해주세요.");
+    return withError(
+      {},
+      "회원가입을 완료하지 못했습니다. 잠시 후 다시 시도해주세요.",
+    );
   }
 
   return {
@@ -80,7 +95,10 @@ export async function signupAction(_: AuthActionState, formData: FormData): Prom
   };
 }
 
-export async function loginAction(_: AuthActionState, formData: FormData): Promise<AuthActionState> {
+export async function loginAction(
+  _: AuthActionState,
+  formData: FormData,
+): Promise<AuthActionState> {
   const parsed = loginSchema.safeParse({
     email: getFormValue(formData, "email"),
     password: getFormValue(formData, "password"),
@@ -111,7 +129,10 @@ export async function logoutAction() {
   redirect("/");
 }
 
-export async function updateProfileAction(_: AuthActionState, formData: FormData): Promise<AuthActionState> {
+export async function updateProfileAction(
+  _: AuthActionState,
+  formData: FormData,
+): Promise<AuthActionState> {
   const parsed = profileSchema.safeParse({
     displayName: getFormValue(formData, "displayName"),
     leetcodeUsername: getFormValue(formData, "leetcodeUsername"),
@@ -135,7 +156,10 @@ export async function updateProfileAction(_: AuthActionState, formData: FormData
     {
       id: user.id,
       display_name: parsed.data.displayName,
-      ...(formData.has("leetcodeUsername") ? { leetcode_username: parsed.data.leetcodeUsername ?? null } : {}),
+      leetcode_username: parsed.data.bojHandle,
+      // ...(formData.has("leetcodeUsername")
+      //   ? { leetcode_username: parsed.data.leetcodeUsername?.trim() ?? null }
+      //   : {}),
       boj_handle: parsed.data.bojHandle ?? null,
     },
     { onConflict: "id" },

@@ -6,13 +6,20 @@ import { FormNotice, FieldError } from "@/components/auth/auth-shell";
 import { initialAuthActionState } from "@/lib/auth/forms";
 
 export function LoginForm({ notice }: { notice?: string }) {
-  const [state, formAction, isPending] = useActionState(loginAction, initialAuthActionState);
+  const [state, formAction, isPending] = useActionState(
+    loginAction,
+    initialAuthActionState,
+  );
 
   return (
     <form action={formAction} className="space-y-5">
       <div>
-        <p className="font-mono text-xs uppercase tracking-[0.3em] text-slate-500">Login</p>
-        <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">이메일로 로그인</h2>
+        <p className="font-mono text-xs uppercase tracking-[0.3em] text-slate-500">
+          Login
+        </p>
+        <h2 className="mt-2 text-xl font-semibold tracking-tight text-slate-950">
+          이메일로 로그인
+        </h2>
         <p className="mt-2 text-sm leading-6 text-slate-600">
           인증 메일을 이미 확인했다면 바로 로그인할 수 있습니다.
         </p>
@@ -20,11 +27,19 @@ export function LoginForm({ notice }: { notice?: string }) {
 
       <FormNotice
         message={state.message || notice}
-        tone={state.status === "error" ? "error" : state.status === "success" ? "success" : "neutral"}
+        tone={
+          state.status === "error"
+            ? "error"
+            : state.status === "success"
+              ? "success"
+              : "neutral"
+        }
       />
 
       <label className="block">
-        <span className="mb-2 block text-sm font-medium text-slate-700">이메일</span>
+        <span className="mb-2 block text-sm font-medium text-slate-700">
+          이메일
+        </span>
         <input
           name="email"
           type="email"
@@ -36,7 +51,9 @@ export function LoginForm({ notice }: { notice?: string }) {
       </label>
 
       <label className="block">
-        <span className="mb-2 block text-sm font-medium text-slate-700">비밀번호</span>
+        <span className="mb-2 block text-sm font-medium text-slate-700">
+          비밀번호
+        </span>
         <input
           name="password"
           type="password"

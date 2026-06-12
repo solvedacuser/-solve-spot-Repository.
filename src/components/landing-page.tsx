@@ -71,59 +71,60 @@ function formatLeaderName(teamLeader: string | null) {
 export function LandingPage({ topTeams = [] }: LandingPageProps) {
   return (
     <main className="overflow-hidden text-slate-950">
-      <section className="relative min-h-[960px] overflow-hidden px-4 pt-28 text-center sm:min-h-[1040px] sm:px-6 lg:min-h-[1180px] lg:px-8">
-        <div className="relative z-10 mx-auto flex max-w-4xl flex-col items-center">
-          <h1 className="max-w-4xl text-5xl font-bold leading-[1.15] tracking-normal text-slate-950 sm:text-6xl lg:text-7xl">
-            LeetCode 풀이를 분석하고
-            <br className="hidden sm:block" />
-            다음 문제를 추천받으세요
-          </h1>
-          <p className="mt-7 max-w-2xl text-base leading-8 text-slate-600 sm:text-lg">
-            공개 username만 입력하면 풀이 기록, 언어 통계, 태그별 강점, 최근
-            Accepted 기반 추천까지 바로 확인할 수 있어요.
-          </p>
-
-          <form
-            action="/leetcode-api"
-            className="mt-9 flex w-full max-w-2xl flex-col gap-3 rounded-lg border border-slate-200 bg-white/88 p-2 shadow-[0_20px_70px_rgba(37,99,235,0.12)] backdrop-blur sm:flex-row"
-          >
-            <label className="sr-only" htmlFor="leetcode-username">
-              LeetCode username
-            </label>
-            <input
-              id="leetcode-username"
-              name="username"
-              placeholder="LeetCode username"
-              className="min-h-12 flex-1 rounded-md border border-transparent bg-transparent px-4 text-base text-slate-950 outline-none placeholder:text-slate-400 focus:border-blue-200 focus:bg-white"
-            />
-            <button
-              type="submit"
-              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-blue-600 px-6 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
+      <section>
+        <div className="grid grid-cols-1 items-center">
+          <div className="col-start-1 row-start-1 z-10 ml-[5%] mt-16 md:mt-0 md:pb-[3vh] lg:pb-[5vh] tracking-tighter lg:tracking-none">
+            <h1 className="max-w-4xl text-lg font-bold tracking-tighter text-slate-950 sm:text-2xl md:text-3xl lg:text-5xl">
+              LeetCode 풀이를 분석하고 <br />
+              다음 문제를 추천받으세요
+            </h1>
+            <p className="mt-2 md:mt-7 max-w-2xl text-xs sm:text-sm md:leading-8 text-slate-900 md:text-base">
+              공개 username만 입력하면 풀이 기록, 언어 통계, 태그별 강점,{" "}
+              <br className="lg:hidden" /> 최근 Accepted 기반 추천까지 바로
+              확인할 수 있어요.
+            </p>
+            <form
+              action="/login"
+              className="mt-5 md:mt-5 flex w-full max-w-lg lg:max-w-2xl flex-col gap-3 rounded-lg border border-slate-200 bg-white/88 p-2 shadow-[0_20px_70px_rgba(37,99,235,0.12)] backdrop-blur sm:flex-row"
             >
-              분석 시작
-              <ArrowRight className="h-4 w-4" />
-            </button>
-          </form>
+              <label className="sr-only" htmlFor="leetcode-username">
+                LeetCode username
+              </label>
+              <input
+                id="leetcode-username"
+                name="username"
+                placeholder="LeetCode username"
+                className="md:min-h-12 flex-1 rounded-md border border-transparent bg-transparent md:px-4 text-base text-slate-900 outline-none placeholder:text-slate-200 focus:border-blue-200 focus:bg-white"
+              />
+              <button
+                type="submit"
+                className="inline-flex sm:min-h-12 items-center justify-center gap-2 rounded-md bg-blue-600 md:px-6 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
+              >
+                분석 시작
+                <ArrowRight className="h-3 w-3 md:h-4 md:w-4" />
+              </button>
+            </form>
 
-          <p className="mt-4 text-sm font-medium text-slate-500">
-            로그인 없이 공개 프로필로 먼저 확인할 수 있습니다.
-          </p>
-        </div>
+            <p className="max-w-lg lg:max-w-2xl mt-4 text-[12px] sm:xs md:text-sm font-medium text-slate-800 text-center">
+              로그인 없이 공개 프로필로 먼저 확인할 수 있습니다.
+            </p>
+          </div>
 
-        <div className="pointer-events-none absolute inset-x-1/2 bottom-0 z-0 w-screen max-w-none -translate-x-1/2 [mask-image:linear-gradient(to_bottom,transparent_0%,black_18%,black_100%)]">
+          {/* <div className="col-start-1 row-start-1 z-0"> */}
           <Image
             src={heroImage}
             alt="코딩 학습과 LeetCode 분석을 표현한 3D 오브젝트"
             priority
-            className="h-auto w-full select-none"
+            className="md:h-auto w-full select-none min-h-[600px] col-start-1 row-start-1 z-0"
             sizes="100vw"
           />
+          {/* </div> */}
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
+      <section className="mx-auto max-w-7xl px-4 py-16 md:py-24 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-3xl text-center">
-          <h2 className="text-3xl font-bold tracking-normal text-slate-950 sm:text-4xl">
+          <h2 className="text-2xl font-bold tracking-normal text-slate-950 sm:text-3xl">
             풀이 기록이 다음 액션으로 이어지도록
           </h2>
           <p className="mt-4 text-base leading-8 text-slate-600 sm:text-lg">
@@ -142,9 +143,9 @@ export function LandingPage({ topTeams = [] }: LandingPageProps) {
                 className="rounded-lg border border-slate-200 bg-white p-6 shadow-[0_16px_50px_rgba(15,23,42,0.06)]"
               >
                 <Icon
-                  className={`h-11 w-11 rounded-lg p-2 ${card.className}`}
+                  className={`h-10 w-10 rounded-lg p-2 ${card.className}`}
                 />
-                <h3 className="mt-5 text-xl font-semibold text-slate-950">
+                <h3 className="mt-5 text-lg font-semibold text-slate-950">
                   {card.title}
                 </h3>
                 <p className="mt-3 text-sm leading-7 text-slate-600">
@@ -156,7 +157,7 @@ export function LandingPage({ topTeams = [] }: LandingPageProps) {
         </div>
       </section>
 
-      <section className="bg-slate-50 px-4 py-20 sm:px-6 lg:px-8">
+      <section className="bg-slate-50 px-4 pt-10 pb-16 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div>
@@ -164,10 +165,10 @@ export function LandingPage({ topTeams = [] }: LandingPageProps) {
                 <Trophy className="h-4 w-4" />
                 Team leaderboard
               </div>
-              <h2 className="mt-3 text-3xl font-bold tracking-normal text-slate-950 sm:text-4xl">
+              <h2 className="mt-3 text-xl font-bold tracking-normal text-slate-950 sm:text-2xl">
                 지금 가장 활발한 상위 팀
               </h2>
-              <p className="mt-4 max-w-2xl text-base leading-8 text-slate-600 sm:text-lg">
+              <p className="mt-3 max-w-2xl text-base leading-8 text-slate-600 sm:text-lg">
                 팀별 해결 문제 수를 기준으로 상위 3개 팀을 보여줍니다.
               </p>
             </div>
@@ -188,7 +189,7 @@ export function LandingPage({ topTeams = [] }: LandingPageProps) {
                 return (
                   <article
                     key={team.teamId}
-                    className={`rounded-lg border p-6 shadow-[0_16px_45px_rgba(15,23,42,0.06)] ${style.border}`}
+                    className={`rounded-lg border p-5 shadow-[0_16px_45px_rgba(15,23,42,0.06)] ${style.border}`}
                   >
                     <div className="flex items-start justify-between gap-4">
                       <div
@@ -207,24 +208,24 @@ export function LandingPage({ topTeams = [] }: LandingPageProps) {
                       </span>
                     </div>
 
-                    <h3 className="mt-5 truncate text-xl font-bold text-slate-950">
+                    <h3 className="mt-2 truncate text-lg font-bold text-slate-950">
                       {team.teamName}
                     </h3>
-                    <p className="mt-2 truncate text-sm font-medium text-slate-500">
+                    <p className="mt-1 truncate text-sm font-medium text-slate-500">
                       {formatLeaderName(team.teamLeader)}
                     </p>
 
-                    <div className="mt-6 grid grid-cols-2 gap-3">
-                      <div className="rounded-lg border border-slate-200 bg-white/80 p-4">
-                        <div className="text-2xl font-bold text-slate-950">
+                    <div className="mt-4 grid grid-cols-2 gap-3">
+                      <div className="rounded-lg border border-slate-200 bg-white/80 p-2">
+                        <div className="text-xl font-bold text-slate-950">
                           {team.solved.toLocaleString()}
                         </div>
                         <div className="mt-1 text-xs font-medium text-slate-500">
                           해결 문제
                         </div>
                       </div>
-                      <div className="rounded-lg border border-slate-200 bg-white/80 p-4">
-                        <div className="flex items-center gap-2 text-2xl font-bold text-slate-950">
+                      <div className="rounded-lg border border-slate-200 bg-white/80 p-2">
+                        <div className="flex items-center gap-2 text-xl font-bold text-slate-950">
                           <UsersRound className="h-5 w-5 text-slate-400" />
                           {team.memberCount.toLocaleString()}
                         </div>
@@ -250,20 +251,20 @@ export function LandingPage({ topTeams = [] }: LandingPageProps) {
         </div>
       </section>
 
-      <section className="flex flex-col w-full justify-center py-32 pb-60 sm:py-44 md:py-60 lg:py-80 lg:pb-96 bg-white">
+      <section className="flex flex-col w-full justify-center py-20 pb-60 sm:py-28 md:py-32 lg:py-36 lg:pb-80 bg-white">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center text-xl sm:2xl md:text-3xl lg:text-4xl mb-24 md:mb-32 lg:mb-52 hover:scale-125 duration-100">
-            <span className="inline-block text-blue-600 font-semibold text-2xl sm:text-3xl md:text-4xl lg:text-5xl pb-6">
+          <div className="text-center text-lg sm:xl md:text-2xl lg:text-3xl mb-24 md:mb-28 lg:mb-32 hover:scale-125 duration-100">
+            <span className="inline-block text-blue-600 font-semibold text-xl sm:text-2xl md:text-3xl lg:text-4xl pb-6">
               알고리즘과 자료구조
             </span>
             ,<br /> 과연
-            <span className="text-orange-600 font-semibold text-2xl sm:text-3xl md:text-4xl lg:text-5xl">
+            <span className="text-orange-600 font-semibold text-xl sm:text-2xl md:text-3xl lg:text-4xl">
               {" "}
               지금도{" "}
             </span>
             공부해야 하나?
           </div>
-          <div className="space-y-40 sm:space-y-48 md:space-y-60 lg:space-y-60 w-[100%] px-6 sm:px-12 md:px-16 lg:px-20 mx-auto">
+          <div className="space-y-20 sm:space-y-28 md:space-y-32 lg:space-y-36 w-[100%] px-6 sm:px-12 md:px-16 lg:px-20 mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-2 justify-center items-center gap-8 md:gap-12 lg:gap-20">
               <div className="flex flex-col p-5 rounded-xl space-y-3 hover:shadow-xl hover:-translate-y-2 duration-300 transition-all">
                 <Chip
@@ -279,10 +280,10 @@ export function LandingPage({ topTeams = [] }: LandingPageProps) {
                     },
                   }}
                 ></Chip>
-                <span className="text-xl sm:text-2xl md:text-3xl font-semibold tracking-tight">
+                <span className="text-lg sm:text-lg md:text-xl font-semibold tracking-tight">
                   서류 합격해도 면접장 구경 못하는 현실
                 </span>
-                <p className="text-base sm:text-lg md:text-xl text-slate-500 font-medium">
+                <p className="text-base sm:text-base md:text-lg text-slate-500 font-medium">
                   <span className="inline-block pb-2">
                     밤새 만든 포트폴리오,
                     <br className="lg:hidden" /> 보여줄 기회조차 없다면?
@@ -331,18 +332,20 @@ export function LandingPage({ topTeams = [] }: LandingPageProps) {
                     },
                   }}
                 ></Chip>
-                <span className="text-xl sm:text-2xl md:text-3xl font-semibold tracking-tight">
+                <span className="text-lg sm:text-lg md:text-xl font-semibold tracking-tight">
                   AI 시대에 요구되는 역량은
                   <br /> 기본기로부터 나옵니다.
                 </span>
-                <p className="text-base sm:text-lg md:text-xl text-slate-500 font-medium pt-2">
+                <p className="text-base sm:text-base md:text-lg text-slate-500 font-medium pt-2">
                   <span className="inline-block pb-2">
-                    <b>&apos;문제 정의 및 구조화&apos;</b>, <b>&apos;테스트와 검증&apos;</b>,{" "}
+                    <b>&apos;문제 정의 및 구조화&apos;</b>,{" "}
+                    <b>&apos;테스트와 검증&apos;</b>,{" "}
                     <b>&apos;설계 능력&apos;</b>
                   </span>
                   <br />
                   <span className="inline-block">
-                    그 시작은 <b>&apos;알고리즘&apos;</b>과 <b>자료구조&apos;</b>입니다.
+                    그 시작은 <b>&apos;알고리즘&apos;</b>과{" "}
+                    <b>자료구조&apos;</b>입니다.
                   </span>
                 </p>
               </div>
@@ -362,10 +365,10 @@ export function LandingPage({ topTeams = [] }: LandingPageProps) {
                     },
                   }}
                 ></Chip>
-                <span className="text-xl sm:text-2xl md:text-3xl font-semibold tracking-tight">
+                <span className="text-lg sm:text-lg md:text-xl font-semibold tracking-tight">
                   기술 면접부터 실무까지
                 </span>
-                <p className="text-base sm:text-lg md:text-xl text-slate-500 font-medium pt-2">
+                <p className="text-base sm:text-base md:text-lg text-slate-500 font-medium pt-2">
                   <span className="inline-block pb-2">
                     코드가 작성된 <b>배경</b>과 <b>이유</b>를
                     <br className="md:hidden" />
@@ -401,7 +404,6 @@ export function LandingPage({ topTeams = [] }: LandingPageProps) {
           </div>
         </div>
       </section>
-
     </main>
   );
 }

@@ -6,13 +6,20 @@ import { FormNotice, FieldError } from "@/components/auth/auth-shell";
 import { initialAuthActionState } from "@/lib/auth/forms";
 
 export function SignupForm() {
-  const [state, formAction, isPending] = useActionState(signupAction, initialAuthActionState);
+  const [state, formAction, isPending] = useActionState(
+    signupAction,
+    initialAuthActionState,
+  );
 
   return (
     <form action={formAction} className="space-y-5">
       <div>
-        <p className="font-mono text-xs uppercase tracking-[0.3em] text-slate-500">Signup</p>
-        <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">이메일 회원가입</h2>
+        <p className="font-mono text-xs uppercase tracking-[0.3em] text-slate-500">
+          Signup
+        </p>
+        <h2 className="mt-2 text-xl font-semibold tracking-tight text-slate-950">
+          이메일 회원가입
+        </h2>
         <p className="mt-2 text-sm leading-6 text-slate-600">
           가입 후 확인 메일을 보내고, 메일 링크에서 세션을 생성합니다.
         </p>
@@ -20,22 +27,32 @@ export function SignupForm() {
 
       <FormNotice
         message={state.message}
-        tone={state.status === "error" ? "error" : state.status === "success" ? "success" : "neutral"}
+        tone={
+          state.status === "error"
+            ? "error"
+            : state.status === "success"
+              ? "success"
+              : "neutral"
+        }
       />
 
       <label className="block">
-        <span className="mb-2 block text-sm font-medium text-slate-700">이름</span>
+        <span className="mb-2 block text-sm font-medium text-slate-700">
+          이름
+        </span>
         <input
           name="displayName"
           autoComplete="name"
           className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-orange-500 focus:ring-4 focus:ring-orange-100"
-          placeholder="Code Mate"
+          placeholder="활동명"
         />
         <FieldError message={state.fieldErrors.displayName} />
       </label>
 
       <label className="block">
-        <span className="mb-2 block text-sm font-medium text-slate-700">이메일</span>
+        <span className="mb-2 block text-sm font-medium text-slate-700">
+          이메일
+        </span>
         <input
           name="email"
           type="email"
@@ -47,7 +64,9 @@ export function SignupForm() {
       </label>
 
       <label className="block">
-        <span className="mb-2 block text-sm font-medium text-slate-700">비밀번호</span>
+        <span className="mb-2 block text-sm font-medium text-slate-700">
+          비밀번호
+        </span>
         <input
           name="password"
           type="password"
@@ -59,13 +78,14 @@ export function SignupForm() {
       </label>
 
       <label className="block">
-        <span className="mb-2 block text-sm font-medium text-slate-700">BOJ handle</span>
+        <span className="mb-2 block text-sm font-medium text-slate-700">
+          Leetcode username
+        </span>
         <input
           name="bojHandle"
           className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-orange-500 focus:ring-4 focus:ring-orange-100"
-          placeholder="선택 입력"
+          placeholder="필수 입력"
         />
-        <p className="mt-2 text-sm text-slate-500">지금 비워두고 로그인 후 계정 설정에서 연결해도 됩니다.</p>
         <FieldError message={state.fieldErrors.bojHandle} />
       </label>
 

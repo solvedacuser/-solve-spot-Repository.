@@ -2,7 +2,7 @@ import Link from "next/link";
 import waypointsImage from "@/images/waypoints.svg";
 
 const PlatformInfo = {
-  name: "Solve Spot",
+  name: "SOLVE SPOT",
   logoSrc: waypointsImage.src,
 };
 
@@ -16,9 +16,11 @@ export function PlatformLogo() {
         <img
           src={PlatformInfo.logoSrc}
           alt="logo"
-          className="object-contain md:w-12 md:h-12"
+          className="object-contain w-8 h-8 md:w-10 md:h-10"
         />
-        <span className="text-base md:text-2xl">{PlatformInfo.name}</span>
+        <span className="text-sm sm:text-sm md:text-xl">
+          {PlatformInfo.name}
+        </span>
       </Link>
     </div>
   );
@@ -32,13 +34,13 @@ export default function Footer() {
           <PlatformLogo />
           <div className="flex flex-row items-center space-x-3 md:space-x-5 pr-3 md:pr-10 justify-between">
             {/* <Link href={""}> */}
-            <span className="text-sm md:text-xl">Contact</span>
+            <span className="text-xs sm:text-sm md:text-lg">Contact</span>
             {/* </Link> */}
             {/* <Link href={""}> */}
-            <span className="text-sm md:text-xl">Learn more</span>
+            <span className="text-xs sm:text-sm md:text-lg">Learn more</span>
             {/* </Link>
             <Link href={""}> */}
-            <span className="text-sm md:text-xl">Support</span>
+            <span className="text-xs sm:text-sm md:text-lg">Support</span>
             {/* </Link> */}
           </div>
         </div>

@@ -5,6 +5,7 @@ create table if not exists public.profiles (
   boj_handle text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
+  signup_at timestamptz,
   constraint profiles_pkey primary key (id),
   constraint profiles_id_fkey foreign key (id) references auth.users (id) on delete cascade
 );
@@ -144,3 +145,44 @@ for update
 to authenticated
 using ((select auth.uid()) = id)
 with check ((select auth.uid()) = id);
+
+
+create or replace function public.set_signup_at()
+returns trigger as $$
+begin
+  if (old.last_sign_in_at is null and new.last_sign_in_at is not null) then
+    insert into public.profiles (id, signup_at)
+    values (new.id, new.last_sign_in_at)
+    on conflict (id) 
+    do update set signup_at = excluded.signup_at;
+  end if;
+  return new;
+end;
+$$ language plpgsql security definer;
+
+create trigger on_auth_user_first_signup_verification
+  after update of last_sign_in_at on auth.users
+  for each row
+  execute function public.set_signup_at();
+
+create or replace function public.handle_delete_user()
+returns trigger as $$
+begin
+  if exists(select 1 from auth.users where id = old.id)
+  then delete from auth.users where id = old.id;
+  end if;
+  return old;
+end;
+$$ language plpgsql security definer;
+
+create trigger on_profile_deleted
+  after delete on public.profiles
+  for each row execute procedure public.handle_delete_user();
+
+alter table public.profiles enable row level security;
+
+create policy "profiles_delete_own"
+on public.profiles
+for delete 
+to authenticated 
+using ( (select auth.uid()) = id );

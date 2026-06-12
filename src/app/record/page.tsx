@@ -1,7 +1,11 @@
 import Link from "next/link";
 import { ZodError } from "zod";
 import { RecordAppError } from "@/lib/record/errors";
-import { listRecords, listRecordTeams, loadRecordInsights } from "@/lib/record/service";
+import {
+  listRecords,
+  listRecordTeams,
+  loadRecordInsights,
+} from "@/lib/record/service";
 import type {
   ListRecordsResponse,
   RecordDto,
@@ -67,7 +71,12 @@ function SectionCard({
   className?: string;
 }) {
   return (
-    <section className={cx("rounded-xl border border-slate-200 bg-white shadow-sm", className)}>
+    <section
+      className={cx(
+        "rounded-xl border border-slate-200 bg-white shadow-sm",
+        className,
+      )}
+    >
       {children}
     </section>
   );
@@ -80,7 +89,13 @@ function Badge({
   children: React.ReactNode;
   className?: string;
 }) {
-  return <span className={cx("rounded-md px-2.5 py-1 text-xs font-semibold", className)}>{children}</span>;
+  return (
+    <span
+      className={cx("rounded-md px-2.5 py-1 text-xs font-semibold", className)}
+    >
+      {children}
+    </span>
+  );
 }
 
 function firstParam(value: string | string[] | undefined) {
@@ -92,7 +107,9 @@ function optionalParam(value: string | string[] | undefined) {
   return param?.trim() ? param.trim() : undefined;
 }
 
-async function normalizeSearchParams(searchParams: RecordPageProps["searchParams"]): Promise<RecordPageQuery> {
+async function normalizeSearchParams(
+  searchParams: RecordPageProps["searchParams"],
+): Promise<RecordPageQuery> {
   const params = searchParams ? await searchParams : {};
 
   return {
@@ -126,7 +143,11 @@ async function loadPageData(query: RecordPageQuery) {
     if (recordError instanceof ZodError) {
       return {
         data,
-        error: new RecordAppError("BAD_REQUEST", 400, recordError.issues[0]?.message),
+        error: new RecordAppError(
+          "BAD_REQUEST",
+          400,
+          recordError.issues[0]?.message,
+        ),
         teams,
         insights,
         insightsError,
@@ -191,14 +212,27 @@ function formatDateOnly(value: string | null) {
   }).format(date);
 }
 
-function buildRecordHref(query: RecordPageQuery, updates: Partial<RecordPageQuery>) {
+function buildRecordHref(
+  query: RecordPageQuery,
+  updates: Partial<RecordPageQuery>,
+) {
   const params = new URLSearchParams();
   const next = {
     ...query,
     ...updates,
   };
 
-  for (const key of ["scope", "teamId", "from", "to", "limit", "q", "difficulty", "language", "status"] as const) {
+  for (const key of [
+    "scope",
+    "teamId",
+    "from",
+    "to",
+    "limit",
+    "q",
+    "difficulty",
+    "language",
+    "status",
+  ] as const) {
     const value = next[key];
 
     if (value) {
@@ -213,9 +247,13 @@ function buildRecordHref(query: RecordPageQuery, updates: Partial<RecordPageQuer
 function HiddenRecordQueryFields({ query }: { query: RecordPageQuery }) {
   return (
     <>
-      {query.scope ? <input type="hidden" name="scope" value={query.scope} /> : null}
+      {query.scope ? (
+        <input type="hidden" name="scope" value={query.scope} />
+      ) : null}
       <input type="hidden" name="limit" value={query.limit ?? "50"} />
-      {query.language ? <input type="hidden" name="language" value={query.language} /> : null}
+      {query.language ? (
+        <input type="hidden" name="language" value={query.language} />
+      ) : null}
     </>
   );
 }
@@ -225,8 +263,12 @@ function RecordHeader() {
     <section className="border-b border-slate-200 pb-6">
       <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
         <div className="min-w-0">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-teal-700">기록 관리</p>
-          <h1 className="mt-3 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">풀이 기록</h1>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-teal-700">
+            기록 관리
+          </p>
+          <h1 className="mt-3 text-xl font-bold tracking-tight text-slate-950 sm:text-2xl">
+            풀이 기록
+          </h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
             개인 기록과 팀 기록을 한 화면에서 확인하세요.
           </p>
@@ -254,11 +296,18 @@ function RecordScopeTabs({
   const currentScope = query.scope ?? "mine";
   const firstTeamId = teams[0] ? String(teams[0].id) : undefined;
   const tabs = [
-    { scope: "mine", label: "내 기록", href: buildRecordHref(query, { scope: "mine", teamId: undefined }) },
+    {
+      scope: "mine",
+      label: "내 기록",
+      href: buildRecordHref(query, { scope: "mine", teamId: undefined }),
+    },
     {
       scope: "team",
       label: "팀 기록",
-      href: buildRecordHref(query, { scope: "team", teamId: query.teamId ?? firstTeamId }),
+      href: buildRecordHref(query, {
+        scope: "team",
+        teamId: query.teamId ?? firstTeamId,
+      }),
     },
     {
       scope: "allTeams",
@@ -396,16 +445,26 @@ function RecordFilters({
       </form>
 
       {currentScope === "team" && teams.length === 0 ? (
-        <p className="mt-3 text-sm font-medium text-amber-700">이 계정에서 선택할 수 있는 팀이 없습니다.</p>
+        <p className="mt-3 text-sm font-medium text-amber-700">
+          이 계정에서 선택할 수 있는 팀이 없습니다.
+        </p>
       ) : null}
       {!selectedTeamAvailable ? (
-        <p className="mt-3 text-sm font-medium text-rose-700">선택한 팀을 사용할 수 없습니다.</p>
+        <p className="mt-3 text-sm font-medium text-rose-700">
+          선택한 팀을 사용할 수 없습니다.
+        </p>
       ) : null}
     </SectionCard>
   );
 }
 
-function RecordMetric({ label, value }: { label: string; value: string | null }) {
+function RecordMetric({
+  label,
+  value,
+}: {
+  label: string;
+  value: string | null;
+}) {
   return (
     <div>
       <p className="text-base font-bold text-slate-950">{value || "-"}</p>
@@ -425,14 +484,20 @@ function SolutionCard({ record }: { record: RecordDto }) {
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
               <h3 className="font-bold text-slate-950">{record.author.name}</h3>
-              <Badge className="bg-slate-100 text-slate-600">{roleLabels[record.author.role]}</Badge>
+              <Badge className="bg-slate-100 text-slate-600">
+                {roleLabels[record.author.role]}
+              </Badge>
             </div>
-            <p className="text-xs font-medium text-slate-400">{formatSubmittedAt(record.submittedAt)}</p>
+            <p className="text-xs font-medium text-slate-400">
+              {formatSubmittedAt(record.submittedAt)}
+            </p>
           </div>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <Badge className={statusClasses[record.status]}>{statusLabels[record.status]}</Badge>
+          <Badge className={statusClasses[record.status]}>
+            {statusLabels[record.status]}
+          </Badge>
           <span className="rounded-full border border-slate-200 px-2.5 py-1 text-xs font-semibold text-slate-500">
             댓글 {record.comments}개
           </span>
@@ -442,7 +507,9 @@ function SolutionCard({ record }: { record: RecordDto }) {
       <div className="mt-4 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <h4 className="text-lg font-bold tracking-tight text-slate-950">{record.problem.title}</h4>
+            <h4 className="text-lg font-bold tracking-tight text-slate-950">
+              {record.problem.title}
+            </h4>
             <Badge className={difficultyClasses[record.problem.difficulty]}>
               {difficultyLabels[record.problem.difficulty]}
             </Badge>
@@ -485,7 +552,9 @@ function RecordsEmptyState() {
   return (
     <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center">
       <h3 className="text-base font-bold text-slate-950">기록이 없습니다</h3>
-      <p className="mt-2 text-sm text-slate-500">기록을 추가하거나 현재 필터를 조정해 주세요.</p>
+      <p className="mt-2 text-sm text-slate-500">
+        기록을 추가하거나 현재 필터를 조정해 주세요.
+      </p>
       <Link
         href="/record/new"
         className="mt-5 inline-flex rounded-xl bg-teal-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-700"
@@ -516,8 +585,12 @@ function ErrorState({ error }: { error: RecordAppError }) {
   if (error.code === "UNAUTHORIZED") {
     return (
       <div className="rounded-xl border border-slate-200 bg-white p-6">
-        <h2 className="text-lg font-bold text-slate-950">로그인이 필요합니다</h2>
-        <p className="mt-2 text-sm leading-6 text-slate-500">기록을 보거나 만들려면 먼저 로그인해 주세요.</p>
+        <h2 className="text-lg font-bold text-slate-950">
+          로그인이 필요합니다
+        </h2>
+        <p className="mt-2 text-sm leading-6 text-slate-500">
+          기록을 보거나 만들려면 먼저 로그인해 주세요.
+        </p>
         <Link
           href="/login"
           className="mt-5 inline-flex rounded-xl bg-teal-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-700"
@@ -530,8 +603,12 @@ function ErrorState({ error }: { error: RecordAppError }) {
 
   return (
     <div className="rounded-xl border border-rose-200 bg-rose-50 p-6">
-      <h2 className="text-lg font-bold text-rose-950">기록을 불러오지 못했습니다</h2>
-      <p className="mt-2 text-sm leading-6 text-rose-700">{getRecordErrorMessage(error)}</p>
+      <h2 className="text-lg font-bold text-rose-950">
+        기록을 불러오지 못했습니다
+      </h2>
+      <p className="mt-2 text-sm leading-6 text-rose-700">
+        {getRecordErrorMessage(error)}
+      </p>
     </div>
   );
 }
@@ -558,19 +635,31 @@ function RecordSidebar({
             팀 범위로 전환하면 스트릭과 기여자 점수를 볼 수 있습니다.
           </p>
         ) : teams.length === 0 ? (
-          <p className="mt-2 text-sm leading-6 text-slate-500">이 계정에서 사용할 수 있는 팀 데이터가 없습니다.</p>
+          <p className="mt-2 text-sm leading-6 text-slate-500">
+            이 계정에서 사용할 수 있는 팀 데이터가 없습니다.
+          </p>
         ) : insightsError ? (
-          <p className="mt-2 text-sm leading-6 text-rose-600">{getRecordErrorMessage(insightsError)}</p>
+          <p className="mt-2 text-sm leading-6 text-rose-600">
+            {getRecordErrorMessage(insightsError)}
+          </p>
         ) : insights ? (
           <div className="mt-4 space-y-5">
             <div className="grid grid-cols-2 gap-3">
               <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
-                <p className="text-2xl font-bold text-slate-950">{insights.streak.currentStreakDays}</p>
-                <p className="mt-1 text-xs font-semibold text-slate-500">현재 스트릭</p>
+                <p className="text-xl font-bold text-slate-950">
+                  {insights.streak.currentStreakDays}
+                </p>
+                <p className="mt-1 text-xs font-semibold text-slate-500">
+                  현재 스트릭
+                </p>
               </div>
               <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
-                <p className="text-sm font-bold text-slate-950">{formatDateOnly(insights.streak.lastVerifiedAt)}</p>
-                <p className="mt-1 text-xs font-semibold text-slate-500">마지막 확인</p>
+                <p className="text-sm font-bold text-slate-950">
+                  {formatDateOnly(insights.streak.lastVerifiedAt)}
+                </p>
+                <p className="mt-1 text-xs font-semibold text-slate-500">
+                  마지막 확인
+                </p>
               </div>
             </div>
 
@@ -587,9 +676,12 @@ function RecordSidebar({
                         {contributor.avatarLabel}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-bold text-slate-900">{contributor.name}</p>
+                        <p className="truncate text-sm font-bold text-slate-900">
+                          {contributor.name}
+                        </p>
                         <p className="text-xs font-medium text-slate-500">
-                          기록 {contributor.records}개 / 확인 {contributor.verifiedRecords}개 / 댓글{" "}
+                          기록 {contributor.records}개 / 확인{" "}
+                          {contributor.verifiedRecords}개 / 댓글{" "}
                           {contributor.feedbackComments}개
                         </p>
                       </div>
@@ -600,12 +692,16 @@ function RecordSidebar({
                   ))}
                 </div>
               ) : (
-                <p className="mt-2 text-sm leading-6 text-slate-500">아직 기여 활동이 없습니다.</p>
+                <p className="mt-2 text-sm leading-6 text-slate-500">
+                  아직 기여 활동이 없습니다.
+                </p>
               )}
             </div>
           </div>
         ) : (
-          <p className="mt-2 text-sm leading-6 text-slate-500">아직 표시할 인사이트가 없습니다.</p>
+          <p className="mt-2 text-sm leading-6 text-slate-500">
+            아직 표시할 인사이트가 없습니다.
+          </p>
         )}
       </SectionCard>
     </aside>
@@ -614,7 +710,8 @@ function RecordSidebar({
 
 export default async function RecordPage({ searchParams }: RecordPageProps) {
   const query = await normalizeSearchParams(searchParams);
-  const { data, error, teams, insights, insightsError } = await loadPageData(query);
+  const { data, error, teams, insights, insightsError } =
+    await loadPageData(query);
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -628,8 +725,10 @@ export default async function RecordPage({ searchParams }: RecordPageProps) {
         <SectionCard className="p-4">
           <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h2 className="text-xl font-bold text-slate-950">기록 피드</h2>
-              <p className="mt-1 text-sm text-slate-500">선택한 범위와 필터에 맞는 기록입니다.</p>
+              <h2 className="text-lg font-bold text-slate-950">기록 피드</h2>
+              <p className="mt-1 text-sm text-slate-500">
+                선택한 범위와 필터에 맞는 기록입니다.
+              </p>
             </div>
           </div>
 
@@ -646,7 +745,12 @@ export default async function RecordPage({ searchParams }: RecordPageProps) {
           )}
         </SectionCard>
 
-        <RecordSidebar query={query} teams={teams} insights={insights} insightsError={insightsError} />
+        <RecordSidebar
+          query={query}
+          teams={teams}
+          insights={insights}
+          insightsError={insightsError}
+        />
       </div>
     </main>
   );

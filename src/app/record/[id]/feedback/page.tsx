@@ -5,7 +5,10 @@ import { ZodError } from "zod";
 import { FeedbackForm } from "@/components/record/feedback-form";
 import { RecordAppError } from "@/lib/record/errors";
 import { loadRecordDetail } from "@/lib/record/service";
-import type { FeedbackCommentDto, RecordDetailResponse } from "@/lib/record/types";
+import type {
+  FeedbackCommentDto,
+  RecordDetailResponse,
+} from "@/lib/record/types";
 import { createClient } from "@/utils/supabase/server";
 
 const difficultyClasses = {
@@ -48,9 +51,17 @@ function SectionCard({
   );
 }
 
-function Badge({ children, className }: { children: ReactNode; className?: string }) {
+function Badge({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
   return (
-    <span className={cx("rounded-md px-2.5 py-1 text-xs font-semibold", className)}>
+    <span
+      className={cx("rounded-md px-2.5 py-1 text-xs font-semibold", className)}
+    >
       {children}
     </span>
   );
@@ -117,7 +128,9 @@ function ErrorState({ error }: { error: RecordAppError }) {
   if (error.code === "UNAUTHORIZED") {
     return (
       <SectionCard className="p-6">
-        <h2 className="text-lg font-bold text-slate-950">로그인이 필요합니다</h2>
+        <h2 className="text-lg font-bold text-slate-950">
+          로그인이 필요합니다
+        </h2>
         <p className="mt-2 text-sm leading-6 text-slate-500">
           풀이 피드백을 보려면 먼저 로그인해주세요.
         </p>
@@ -133,8 +146,12 @@ function ErrorState({ error }: { error: RecordAppError }) {
 
   return (
     <SectionCard className="p-6">
-      <h2 className="text-lg font-bold text-slate-950">피드백을 불러오지 못했습니다</h2>
-      <p className="mt-2 text-sm leading-6 text-slate-500">{getRecordErrorMessage(error)}</p>
+      <h2 className="text-lg font-bold text-slate-950">
+        피드백을 불러오지 못했습니다
+      </h2>
+      <p className="mt-2 text-sm leading-6 text-slate-500">
+        {getRecordErrorMessage(error)}
+      </p>
     </SectionCard>
   );
 }
@@ -151,22 +168,31 @@ function CommentList({ comments }: { comments: FeedbackCommentDto[] }) {
   return (
     <div className="space-y-3">
       {comments.map((comment) => (
-        <article key={comment.id} className="rounded-xl border border-slate-200 bg-white p-4">
+        <article
+          key={comment.id}
+          className="rounded-xl border border-slate-200 bg-white p-4"
+        >
           <div className="flex min-w-0 items-center gap-3">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-950 text-xs font-bold text-white">
               {comment.author.avatarLabel}
             </div>
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
-                <h3 className="font-bold text-slate-950">{comment.author.name}</h3>
-                <Badge className="bg-slate-100 text-slate-600">{roleLabels[comment.author.role]}</Badge>
+                <h3 className="font-bold text-slate-950">
+                  {comment.author.name}
+                </h3>
+                <Badge className="bg-slate-100 text-slate-600">
+                  {roleLabels[comment.author.role]}
+                </Badge>
               </div>
               <p className="text-xs font-medium text-slate-400">
                 {formatSubmittedAt(comment.submittedAt)}
               </p>
             </div>
           </div>
-          <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-slate-700">{comment.content}</p>
+          <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-slate-700">
+            {comment.content}
+          </p>
         </article>
       ))}
     </div>
@@ -182,7 +208,7 @@ function FeedbackDetail({ detail }: { detail: RecordDetailResponse }) {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
-              <h2 className="text-2xl font-bold tracking-tight text-slate-950">
+              <h2 className="text-lg font-bold tracking-tight text-slate-950">
                 {record.problem.title}
               </h2>
               <Badge className={difficultyClasses[record.problem.difficulty]}>
@@ -195,7 +221,8 @@ function FeedbackDetail({ detail }: { detail: RecordDetailResponse }) {
               ))}
             </div>
             <p className="mt-2 text-sm font-medium text-slate-500">
-              {record.author.name} · {record.language} · {formatSubmittedAt(record.submittedAt)}
+              {record.author.name} · {record.language} ·{" "}
+              {formatSubmittedAt(record.submittedAt)}
             </p>
             {record.reviewNote ? (
               <p className="mt-3 max-w-3xl rounded-xl bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-600">
@@ -204,8 +231,12 @@ function FeedbackDetail({ detail }: { detail: RecordDetailResponse }) {
             ) : null}
           </div>
           <div className="flex flex-wrap gap-2 text-xs">
-            <Badge className="bg-slate-100 text-slate-700">실행 시간 {record.runtime || "-"}</Badge>
-            <Badge className="bg-slate-100 text-slate-700">메모리 {record.memory || "-"}</Badge>
+            <Badge className="bg-slate-100 text-slate-700">
+              실행 시간 {record.runtime || "-"}
+            </Badge>
+            <Badge className="bg-slate-100 text-slate-700">
+              메모리 {record.memory || "-"}
+            </Badge>
           </div>
         </div>
 
@@ -220,12 +251,14 @@ function FeedbackDetail({ detail }: { detail: RecordDetailResponse }) {
       <SectionCard className="p-5">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h2 className="text-xl font-bold text-slate-950">피드백</h2>
+            <h2 className="text-lg font-bold text-slate-950">피드백</h2>
             <p className="mt-1 text-sm text-slate-500">
               이 풀이에 저장된 리뷰 댓글입니다.
             </p>
           </div>
-          <Badge className="bg-teal-50 text-teal-700">댓글 {comments.length}개</Badge>
+          <Badge className="bg-teal-50 text-teal-700">
+            댓글 {comments.length}개
+          </Badge>
         </div>
 
         <div className="mt-5">
@@ -234,7 +267,7 @@ function FeedbackDetail({ detail }: { detail: RecordDetailResponse }) {
       </SectionCard>
 
       <SectionCard className="p-5">
-        <h2 className="text-xl font-bold text-slate-950">피드백 추가</h2>
+        <h2 className="text-lg font-bold text-slate-950">피드백 추가</h2>
         <p className="mt-2 text-sm leading-6 text-slate-500">
           짧은 리뷰, 질문, 개선 아이디어를 남겨주세요.
         </p>
@@ -244,7 +277,9 @@ function FeedbackDetail({ detail }: { detail: RecordDetailResponse }) {
   );
 }
 
-export default async function RecordFeedbackPage({ params }: RecordFeedbackPageProps) {
+export default async function RecordFeedbackPage({
+  params,
+}: RecordFeedbackPageProps) {
   const { id } = await params;
   const { data, error } = await loadPageDetail(id);
 
@@ -263,7 +298,7 @@ export default async function RecordFeedbackPage({ params }: RecordFeedbackPageP
             <p className="mt-5 text-xs font-semibold uppercase tracking-[0.24em] text-teal-700">
               코드 피드백
             </p>
-            <h1 className="mt-3 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">
+            <h1 className="mt-3 text-xl font-bold tracking-tight text-slate-950 sm:text-2xl">
               피드백 스레드
             </h1>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
@@ -273,7 +308,11 @@ export default async function RecordFeedbackPage({ params }: RecordFeedbackPageP
         </div>
       </section>
 
-      {error ? <div className="mt-6"><ErrorState error={error} /></div> : null}
+      {error ? (
+        <div className="mt-6">
+          <ErrorState error={error} />
+        </div>
+      ) : null}
       {data ? <FeedbackDetail detail={data} /> : null}
     </main>
   );
