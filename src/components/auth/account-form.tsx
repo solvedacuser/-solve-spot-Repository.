@@ -51,7 +51,7 @@ export function AccountForm({
             <br className="hidden md:block" /> Username
           </span>
           <input
-            name="leetcodeUsername"
+            name="boj_handle"
             defaultValue={leetcodeUsername}
             className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-teal-500 focus:ring-4 focus:ring-teal-100"
             placeholder="LeetCode Username"

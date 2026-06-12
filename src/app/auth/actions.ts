@@ -135,8 +135,8 @@ export async function updateProfileAction(
 ): Promise<AuthActionState> {
   const parsed = profileSchema.safeParse({
     displayName: getFormValue(formData, "displayName"),
-    leetcodeUsername: getFormValue(formData, "leetcodeUsername"),
-    bojHandle: getFormValue(formData, "bojHandle"),
+    leetcodeUsername: getFormValue(formData, "boj_handle"),
+    bojHandle: getFormValue(formData, "boj_handle"),
   });
 
   if (!parsed.success) {

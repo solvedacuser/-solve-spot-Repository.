@@ -76,12 +76,13 @@ export default async function AccountPage() {
   const email = user?.email || "email@example.com";
   const signUpDate =
     new Date(profile?.signup_at).toLocaleDateString() || "2026.01.01";
-  const leetcodeProfile = await getUserProfile(username);
-  const avatarUrl = leetcodeProfile.avatarUrl?.trim();
+  const leetcodeProfile = await getUserProfile(username) || "";
+  const avatarUrl = leetcodeProfile.avatarUrl?.trim() || "https://static.vecteezy.com/system/resources/previews/019/879/186/non_2x/user-icon-on-transparent-background-free-png.png";
   const ranking = leetcodeProfile.ranking;
   const reputation = leetcodeProfile.reputation;
-  const langStats = await getLanguageStats(username);
+  const langStats = await getLanguageStats(username) || [];
   const tagSkillStats = await getTagSkillStats(username);
+  console.log("username : ", username)
 
   return (
     <main className=" max-w-7xl mx-auto mt-5 mb-28 mx-auto">
@@ -127,11 +128,11 @@ export default async function AccountPage() {
                 </div>
                 <div className="barChart p-10 flex h-[450px] justify-center">
                   <BarChart
-                    labels={langStats.languages.map(
+                    labels={langStats && langStats?.languages?.map(
                       (item) => item.languageName,
                     )}
                     labelTitle="value"
-                    data={langStats.languages.map(
+                    data={langStats && langStats?.languages?.map(
                       (item) => item.problemsSolved,
                     )}
                     chartTitle="Language stats"
@@ -146,7 +147,7 @@ export default async function AccountPage() {
                 <ul className="list-disc list-inside pl-5">
                   <li className="marker:text-red-500">Advanced</li>
                   <div className="tagsAd">
-                    {tagSkillStats.advanced.map((item, index: number) => (
+                    {tagSkillStats?.advanced?.map((item, index: number) => (
                       <Chip
                         key={index}
                         color="error"
@@ -157,7 +158,7 @@ export default async function AccountPage() {
                   </div>
                   <li className="marker:text-orange-500">Intermediate</li>
                   <div className="tagsInter">
-                    {tagSkillStats.intermediate.map((item, index: number) => (
+                    {tagSkillStats?.intermediate?.map((item, index: number) => (
                       <Chip
                         key={index}
                         color="warning"
@@ -168,7 +169,7 @@ export default async function AccountPage() {
                   </div>
                   <li className="marker:text-green-700">Fundamental</li>
                   <div className="tagsFund">
-                    {tagSkillStats.fundamental.map((item, index: number) => (
+                    {tagSkillStats?.fundamental?.map((item, index: number) => (
                       <Chip
                         key={index}
                         color="success"
