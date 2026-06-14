@@ -1,6 +1,6 @@
-# CodeMate Next
+# slove spot
 
-CodeMate의 Next.js App Router 기반 초안 프로젝트입니다. 현재는 leetcode 연동 기능을 중심으로 구현되어 있으며, 이후 Supabase 기반 인증과 데이터 기능을 확장할 예정입니다.
+Next.js App Router 기반 초안 프로젝트입니다. 현재는 leetcode 연동 기능을 중심으로 구현되어 있으며, 이후 Supabase 기반 인증과 데이터 기능을 확장할 예정입니다.
 
 
 ## 환경 요구 사항
