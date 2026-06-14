@@ -49,7 +49,6 @@ export default async function RootLayout({
         />
       </head>
       <body className="font-sans text-ink antialiased">
-        <div className="noise-overlay" />
         <SiteNav
           isAuthenticated={Boolean(user)}
           userEmail={user?.email}
