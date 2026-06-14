@@ -4,10 +4,6 @@
 
 :root {
   color-scheme: light;
-  --bg-1: #f8fafc;
-  --bg-2: #ecfeff;
-  --bg-3: #fff7ed;
-  --ink: #0f172a;
 }
 
 * {
@@ -21,12 +17,7 @@ html {
 body {
   margin: 0;
   min-height: 100vh;
-  color: var(--ink);
   font-family: var(--font-heading), sans-serif;
-  background:
-    radial-gradient(circle at top left, rgba(20, 184, 166, 0.18), transparent 28%),
-    radial-gradient(circle at top right, rgba(249, 115, 22, 0.16), transparent 24%),
-    linear-gradient(180deg, #ecfeff 0%, #f8fafc 44%, #fff7ed 100%);
 }
 
 a {
@@ -50,14 +41,77 @@ pre,
   background: rgba(15, 118, 110, 0.18);
 }
 
-.noise-overlay {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  opacity: 0.2;
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.12) 1px, transparent 1px);
-  background-size: 32px 32px;
-  mask-image: radial-gradient(circle at center, black 30%, transparent 85%);
+@layer base {
+  :root {
+    --b: 0 0% 100%;
+    --fg: 222 84% 5%;
+    --c: 0 0% 100%;
+    --cf: 222 84% 5%;
+    --pop: 0 0% 100%;
+    --popf: 222 84% 5%;
+    --p: 222 47% 11%;
+    --pf: 210 40% 98%;
+    --s: 210 40% 96%;
+    --sf: 222 47% 11%;
+    --m: 210 40% 96%;
+    --mf: 215 16% 47%;
+    --a: 210 40% 96%;
+    --af: 222 47% 11%;
+    --d: 0 84% 60%;
+    --df: 210 40% 98%;
+    --bd: 214 32% 91%;
+    --in: 214 32% 91%;
+    --r: 222 84% 5%;
+    --ch1: 12 76% 61%;
+    --ch2: 173 58% 39%;
+    --ch3: 197 37% 24%;
+    --ch4: 43 74% 66%;
+    --ch5: 27 87% 67%;
+    --rd: 0.5rem;
+  }
+  .dark {
+    --b: 222 84% 5%;
+    --fg: 210 40% 98%;
+    --c: 222 84% 5%;
+    --cf: 210 40% 98%;
+    --pop: 222 84% 5%;
+    --popf: 210 40% 98%;
+    --p: 210 40% 98%;
+    --pf: 222 47% 11%;
+    --s: 217 33% 18%;
+    --sf: 210 40% 98%;
+    --m: 217 33% 18%;
+    --mf: 215 20% 65%;
+    --a: 217 33% 18%;
+    --af: 210 40% 98%;
+    --d: 0 63% 31%;
+    --df: 210 40% 98%;
+    --bd: 217 33% 18%;
+    --in: 217 33% 18%;
+    --r: 213 27% 84%;
+    --ch1: 220 70% 50%;
+    --ch2: 160 60% 45%;
+    --ch3: 30 80% 55%;
+    --ch4: 280 65% 60%;
+    --ch5: 340 75% 55%;
+  }
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
 }

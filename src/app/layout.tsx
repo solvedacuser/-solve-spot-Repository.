@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Mono, Space_Grotesk } from "next/font/google";
+import { SiteNav } from "@/components/site-nav";
+import { createClient } from "@/utils/supabase/server";
 import "./globals.css";
+
+import { Toaster } from "@/components/ui/toaster"
+import Footer from "@/components/footer";
 
 const headingFont = Space_Grotesk({
   subsets: ["latin"],
@@ -15,15 +20,45 @@ const monoFont = IBM_Plex_Mono({
 
 export const metadata: Metadata = {
   title: "CodeMate Solved.ac Draft",
-  description: "solved.ac handle lookup, bio lookup, recommendation, and solved verification tools.",
+  description:
+    "solved.ac handle lookup, bio lookup, recommendation, and solved verification tools.",
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default async function RootLayout({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const { data: profile } = user
+    ? await supabase
+        .from("profiles")
+        .select("display_name")
+        .eq("id", user.id)
+        .maybeSingle()
+    : { data: null };
+
   return (
     <html lang="ko" className={`${headingFont.variable} ${monoFont.variable}`}>
+      <head>
+      <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        />
+      </head>
       <body className="font-sans text-ink antialiased">
-        <div className="noise-overlay" />
+        <SiteNav
+          isAuthenticated={Boolean(user)}
+          userEmail={user?.email}
+          displayName={profile?.display_name}
+        />
         {children}
+        
+        <Toaster />
+        <Footer />
+
       </body>
     </html>
   );
