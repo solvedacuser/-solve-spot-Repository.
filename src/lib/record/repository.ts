@@ -1,8 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type {
-  CreatedTeamRow,
   CreateFeedbackRequest,
-  CreateRecordTeamRequest,
   CreateRecordRequest,
   FeedbackContributionRow,
   FeedbackCommentRow,
@@ -44,20 +42,6 @@ type InsertFeedbackCommentRow = {
   content: string;
 };
 
-type InsertTeamRow = {
-  teamName: string;
-  description: string | null;
-  teamLeader: string;
-  UserList: string[];
-  isActivated: number;
-};
-
-type InsertTeamMemberRow = {
-  team_id: number;
-  user_id: string;
-  role: TeamMembershipRow["role"];
-};
-
 export type RepositoryResult<T> = {
   data: T;
   error: SupabaseError | null;
@@ -82,43 +66,56 @@ function toExclusiveEndOfUtcDay(value: string) {
   return new Date(Date.UTC(year, month - 1, day + 1)).toISOString();
 }
 
+function applyRecordListFilters<TRequest extends {
+  ilike(column: string, value: string): TRequest;
+  eq(column: string, value: string): TRequest;
+  gte(column: string, value: string): TRequest;
+  lt(column: string, value: string): TRequest;
+}>(request: TRequest, query: ListRecordsQuery) {
+  let filtered = request;
+  const searchTerm = normalizeSearchTerm(query.q);
+
+  if (searchTerm) {
+    filtered = filtered.ilike("problem_title", searchTerm);
+  }
+
+  if (query.difficulty) {
+    filtered = filtered.eq("difficulty", query.difficulty);
+  }
+
+  if (query.language) {
+    filtered = filtered.eq("language", query.language);
+  }
+
+  if (query.status) {
+    filtered = filtered.eq("status", query.status);
+  }
+
+  if (query.from) {
+    filtered = filtered.gte("created_at", toStartOfUtcDay(query.from));
+  }
+
+  if (query.to) {
+    filtered = filtered.lt("created_at", toExclusiveEndOfUtcDay(query.to));
+  }
+
+  return filtered;
+}
+
 export async function listRecordRows(
   supabase: RecordSupabaseClient,
   authorId: string,
   query: ListRecordsQuery,
 ): Promise<RepositoryResult<RecordRow[]>> {
-  let request = supabase
+  const request = applyRecordListFilters(
+    supabase
     .from("code_records")
     .select("*")
     .eq("author_id", authorId)
     .order("created_at", { ascending: false })
-    .limit(query.limit);
-
-  const searchTerm = normalizeSearchTerm(query.q);
-
-  if (searchTerm) {
-    request = request.ilike("problem_title", searchTerm);
-  }
-
-  if (query.difficulty) {
-    request = request.eq("difficulty", query.difficulty);
-  }
-
-  if (query.language) {
-    request = request.eq("language", query.language);
-  }
-
-  if (query.status) {
-    request = request.eq("status", query.status);
-  }
-
-  if (query.from) {
-    request = request.gte("created_at", toStartOfUtcDay(query.from));
-  }
-
-  if (query.to) {
-    request = request.lt("created_at", toExclusiveEndOfUtcDay(query.to));
-  }
+    .limit(query.limit),
+    query,
+  );
 
   const { data, error } = await request;
 
@@ -133,38 +130,15 @@ export async function listRecordRowsByTeam(
   teamId: number,
   query: ListRecordsQuery,
 ): Promise<RepositoryResult<RecordRow[]>> {
-  let request = supabase
+  const request = applyRecordListFilters(
+    supabase
     .from("code_records")
     .select("*")
     .eq("team_id", teamId)
     .order("created_at", { ascending: false })
-    .limit(query.limit);
-
-  const searchTerm = normalizeSearchTerm(query.q);
-
-  if (searchTerm) {
-    request = request.ilike("problem_title", searchTerm);
-  }
-
-  if (query.difficulty) {
-    request = request.eq("difficulty", query.difficulty);
-  }
-
-  if (query.language) {
-    request = request.eq("language", query.language);
-  }
-
-  if (query.status) {
-    request = request.eq("status", query.status);
-  }
-
-  if (query.from) {
-    request = request.gte("created_at", toStartOfUtcDay(query.from));
-  }
-
-  if (query.to) {
-    request = request.lt("created_at", toExclusiveEndOfUtcDay(query.to));
-  }
+    .limit(query.limit),
+    query,
+  );
 
   const { data, error } = await request;
 
@@ -188,38 +162,15 @@ export async function listRecordRowsByTeams(
     };
   }
 
-  let request = supabase
+  const request = applyRecordListFilters(
+    supabase
     .from("code_records")
     .select("*")
     .in("team_id", uniqueTeamIds)
     .order("created_at", { ascending: false })
-    .limit(query.limit);
-
-  const searchTerm = normalizeSearchTerm(query.q);
-
-  if (searchTerm) {
-    request = request.ilike("problem_title", searchTerm);
-  }
-
-  if (query.difficulty) {
-    request = request.eq("difficulty", query.difficulty);
-  }
-
-  if (query.language) {
-    request = request.eq("language", query.language);
-  }
-
-  if (query.status) {
-    request = request.eq("status", query.status);
-  }
-
-  if (query.from) {
-    request = request.gte("created_at", toStartOfUtcDay(query.from));
-  }
-
-  if (query.to) {
-    request = request.lt("created_at", toExclusiveEndOfUtcDay(query.to));
-  }
+    .limit(query.limit),
+    query,
+  );
 
   const { data, error } = await request;
 
@@ -485,52 +436,3 @@ export async function checkRecordTeamMembership(
   };
 }
 
-export async function createTeamRow(
-  supabase: RecordSupabaseClient,
-  input: CreateRecordTeamRequest,
-  leaderUsername: string,
-  legacyUserList: string[],
-): Promise<RepositoryResult<CreatedTeamRow | null>> {
-  const insertRow: InsertTeamRow = {
-    teamName: input.name,
-    description: toNullableText(input.description),
-    teamLeader: leaderUsername,
-    UserList: legacyUserList,
-    isActivated: 1,
-  };
-
-  const { data, error } = await supabase
-    .from("team")
-    .insert(insertRow)
-    .select("rid, teamName, description, teamLeader, UserList")
-    .single();
-
-  return {
-    data: data as CreatedTeamRow | null,
-    error,
-  };
-}
-
-export async function createTeamMembershipRow(
-  supabase: RecordSupabaseClient,
-  teamId: number,
-  userId: string,
-  role: TeamMembershipRow["role"],
-): Promise<RepositoryResult<TeamMembershipRow | null>> {
-  const insertRow: InsertTeamMemberRow = {
-    team_id: teamId,
-    user_id: userId,
-    role,
-  };
-
-  const { data, error } = await supabase
-    .from("team_members")
-    .insert(insertRow)
-    .select("team_id, user_id, role")
-    .single();
-
-  return {
-    data: data as TeamMembershipRow | null,
-    error,
-  };
-}

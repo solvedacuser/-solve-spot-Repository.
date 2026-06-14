@@ -1,10 +1,7 @@
 import type { User } from "@supabase/supabase-js";
-import { z } from "zod";
 import { RecordAppError, mapRecordDatabaseError } from "@/lib/record/errors";
 import {
-  createdTeamRowSchema,
   createFeedbackRequestSchema,
-  createRecordTeamRequestSchema,
   createRecordRequestSchema,
   feedbackContributionRowSchema,
   recordTeamDtoSchema,
@@ -28,8 +25,6 @@ import {
   checkRecordTeamMembership,
   createFeedbackCommentRow,
   createRecordRow,
-  createTeamMembershipRow,
-  createTeamRow,
   listCommentCountsByRecordId,
   listFeedbackContributionRowsByRecordIds,
   listFeedbackCommentRows,
@@ -47,7 +42,6 @@ import {
 import type {
   FeedbackCommentDto,
   FeedbackCommentRow,
-  CreateRecordTeamRequest,
   FeedbackContributionRow,
   ListRecordsResponse,
   ProfileRow,
@@ -116,8 +110,6 @@ function getAvatarLabel(name: string) {
 function createProfileMap(rows: ProfileRow[]) {
   return new Map(rows.map((row) => [row.id, profileRowSchema.parse(row)]));
 }
-
-const authUserIdSchema = z.string().uuid();
 
 function toRecordDto({
   row,
@@ -206,70 +198,6 @@ function toRecordTeamDto(row: unknown): RecordTeamDto {
   });
 }
 
-function toLegacyUserList(values: unknown[]) {
-  return values
-    .map((value) => {
-      if (typeof value === "string") {
-        return value.trim();
-      }
-
-      if (value && typeof value === "object") {
-        return JSON.stringify(value);
-      }
-
-      return "";
-    })
-    .filter(Boolean);
-}
-
-function collectAuthUserIds(values: unknown[]) {
-  const candidateKeys = ["id", "user_id", "userId", "auth_user_id", "authUserId"];
-  const ids = new Set<string>();
-
-  for (const value of values) {
-    if (typeof value === "string") {
-      const parsed = authUserIdSchema.safeParse(value.trim());
-
-      if (parsed.success) {
-        ids.add(parsed.data);
-      }
-
-      continue;
-    }
-
-    if (!value || typeof value !== "object" || Array.isArray(value)) {
-      continue;
-    }
-
-    const record = value as Record<string, unknown>;
-
-    for (const key of candidateKeys) {
-      const candidate = record[key];
-
-      if (typeof candidate !== "string") {
-        continue;
-      }
-
-      const parsed = authUserIdSchema.safeParse(candidate.trim());
-
-      if (parsed.success) {
-        ids.add(parsed.data);
-      }
-    }
-  }
-
-  return Array.from(ids);
-}
-
-async function getCurrentProfile(supabase: RecordSupabaseClient, userId: string) {
-  const profiles = assertRepositoryResult(
-    await listProfilesByIds(supabase, [userId]),
-    "Failed to load the current profile.",
-  );
-
-  return profiles[0] ? profileRowSchema.parse(profiles[0]) : null;
-}
-
 export async function listRecordTeams(supabase: RecordSupabaseClient): Promise<RecordTeamDto[]> {
   const user = await getAuthenticatedUser(supabase);
   const rows = assertRepositoryResult(
@@ -306,48 +234,6 @@ export async function assertRecordTeamMember(
   }
 
   return parsedTeamId;
-}
-
-export async function createRecordTeam(
-  supabase: RecordSupabaseClient,
-  input: unknown,
-): Promise<RecordTeamDto> {
-  const user = await getAuthenticatedUser(supabase);
-  const parsedInput: CreateRecordTeamRequest = createRecordTeamRequestSchema.parse(input);
-  const profile = await getCurrentProfile(supabase, user.id);
-  const leaderUsername = profile?.leetcode_username?.trim() || getMetadataValue(user, "leetcode_username");
-
-  if (!leaderUsername) {
-    throw new RecordAppError("BAD_REQUEST", 400, "Set your LeetCode username before creating a team.");
-  }
-
-  const legacyUserList = toLegacyUserList(parsedInput.invitedUsers);
-  const team = assertRepositoryResult(
-    await createTeamRow(supabase, parsedInput, leaderUsername, legacyUserList),
-    "Failed to create the team.",
-  );
-
-  if (!team) {
-    throw new RecordAppError("INTERNAL_ERROR", 500, "The created team was not returned.");
-  }
-
-  const parsedTeam = createdTeamRowSchema.parse(team);
-  const leaderMembership = assertRepositoryResult(
-    await createTeamMembershipRow(supabase, parsedTeam.rid, user.id, "Leader"),
-    "Failed to create the team leader membership.",
-  );
-
-  if (!leaderMembership) {
-    throw new RecordAppError("INTERNAL_ERROR", 500, "The created team leader membership was not returned.");
-  }
-
-  const invitedUserIds = collectAuthUserIds(parsedInput.invitedUsers).filter((userId) => userId !== user.id);
-
-  for (const invitedUserId of invitedUserIds) {
-    await createTeamMembershipRow(supabase, parsedTeam.rid, invitedUserId, "Member");
-  }
-
-  return toRecordTeamDto(parsedTeam);
 }
 
 type ContributorStats = {

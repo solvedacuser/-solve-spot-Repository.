@@ -50,28 +50,6 @@ export const createRecordRequestSchema = z.object({
   teamId: recordTeamIdSchema.optional(),
 });
 
-const teamNameSchema = z.string().trim().min(1).max(100);
-
-export const createRecordTeamRequestSchema = z.preprocess(
-  (value) => {
-    if (!value || typeof value !== "object" || Array.isArray(value)) {
-      return value;
-    }
-
-    const record = value as Record<string, unknown>;
-
-    return {
-      ...record,
-      name: record.name ?? record.teamName,
-    };
-  },
-  z.object({
-    name: teamNameSchema,
-    description: optionalNullableText(1_000),
-    invitedUsers: z.array(z.unknown()).max(100).default([]),
-  }),
-);
-
 export const listRecordsQuerySchema = z.object({
   scope: recordScopeSchema.default("mine"),
   teamId: recordTeamIdSchema.optional(),
