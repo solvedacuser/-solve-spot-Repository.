@@ -58,7 +58,7 @@ export function AccountForm({
           />
         </div>
         <div className="ml-auto">
-          <FieldError message={state.fieldErrors.leetcodeUsername} />
+          <FieldError message={state.fieldErrors.bojHandle ?? state.fieldErrors.leetcodeUsername} />
         </div>
       </label>
 
