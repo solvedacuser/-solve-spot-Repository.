@@ -2,6 +2,7 @@
 
 ## Source Of Truth
 - This document is the working source of truth for replacing the current solved.ac integration with LeetCode GraphQL.
+- Active `/api/leetcode/*` Route Handlers currently expose only user, language, skill, and calendar lookups. Other LeetCode sections in this document are retained as future/reference material.
 - The implementation should keep the same local-only architecture used by the solved.ac integration:
   - Do not call the existing Spring backend from this app.
   - Add LeetCode behavior under `src/lib/leetcode/*` first.
@@ -73,17 +74,13 @@
   - `SESSION_QUESTION_STATUS`: future authenticated mode; checks the current user's `question.status`.
   - `NONE`: recommendation did not apply solved exclusion.
 
-## Proposed API Surface
+## Active API Surface
 | Endpoint | Method | Purpose | Cache |
 | --- | --- | --- | --- |
 | `/api/leetcode/user?username=...` | `GET` | Public user profile and solved stats | Yes, short TTL |
-| `/api/leetcode/bio?username=...` | `GET` | Public user bio only | Yes, short TTL |
 | `/api/leetcode/language?username=...` | `GET` | Public language solved counts | Yes, short TTL |
 | `/api/leetcode/skill?username=...` | `GET` | Public tag solved counts grouped by skill level | Yes, short TTL |
 | `/api/leetcode/calendar?username=...&year=2026` | `GET` | Public submission calendar summary | Yes, short TTL |
-| `/api/leetcode/contest?username=...` | `GET` | Public contest ranking and contest history | Yes, short TTL |
-| `/api/leetcode/recommend` | `POST` | Problem candidates with explicit public exclusion semantics | No by default |
-| `/api/leetcode/verify-problem` | `POST` | Recent accepted verification by public username, or optional session status later | No by default |
 
 ## Candidate API Extensions
 These endpoints came from `alfa-leetcode-api` and `leetcode-graphql-queries`. P1 entries are implemented as profile extensions; lower-priority entries remain follow-up candidates.
@@ -125,61 +122,6 @@ These endpoints came from `alfa-leetcode-api` and `leetcode-graphql-queries`. P1
   - `userPublicProfile`
   - `userProblemsSolved`
   - optional: `languageStats`, `skillStats`, `userContestRankingInfo`
-
-### `GET /api/leetcode/bio?username=...`
-- Query params:
-  - `username`: public LeetCode username
-- Suggested upstream query:
-  - `userPublicProfile`
-- Read:
-  - `matchedUser.profile.aboutMe`
-
-### `POST /api/leetcode/recommend`
-- Body:
-  ```json
-  {
-    "usernames": ["alice", "bob"],
-    "count": 5,
-    "difficulty": ["EASY", "MEDIUM"],
-    "tagSlugs": ["array", "dynamic-programming"],
-    "skip": 0,
-    "recentAcceptedLimit": 100
-  }
-  ```
-- Suggested upstream queries:
-  - `recentAcSubmissionList(username, limit)` for exclusions
-  - `problemsetQuestionList(categorySlug, limit, skip, filters)` for candidates
-- Notes:
-  - Fetch more candidates than `count` if exclusions can remove items.
-  - Exclude paid-only questions by default unless a product decision says otherwise.
-
-### Problemset Filter Mapping
-| Local Request Field | GraphQL Variable | Notes |
-| --- | --- | --- |
-| `count` | `limit` | Use the requested count as the final result count. The upstream `limit` may need to be larger to account for recent-accepted exclusions. |
-| `skip` | `skip` | Use for pagination or random page selection. Default to `0`. |
-| `difficulty` | `filters.difficulty` | Use LeetCode difficulty strings such as `EASY`, `MEDIUM`, and `HARD`. If multiple difficulties are requested, make separate upstream requests or confirm LeetCode accepts the selected filter shape before relying on it. |
-| `tagSlugs` | `filters.tags` | Use LeetCode topic tag slugs such as `array`, `hash-table`, or `dynamic-programming`. |
-| `recentAcceptedLimit` | recent accepted query `limit` | Controls only public solved-exclusion confidence. It does not prove unsolved status beyond this window. |
-
-### `POST /api/leetcode/verify-problem`
-- Body:
-  ```json
-  {
-    "username": "alice",
-    "titleSlug": "two-sum",
-    "recentAcceptedLimit": 100
-  }
-  ```
-- Suggested public upstream query:
-  - `recentAcSubmissionList(username, limit)`
-- Future session-based body extension:
-  ```json
-  {
-    "titleSlug": "two-sum",
-    "mode": "SESSION_QUESTION_STATUS"
-  }
-  ```
 
 ## GraphQL Query Notes
 Keep query documents in server-only code, for example:
@@ -352,20 +294,18 @@ Use the same normalized error wrapper shape as the solved.ac integration:
 
 ## Suggested Type Names
 - `LeetCodeUserResponse`
-- `LeetCodeBioResponse`
-- `LeetCodeProblem`
-- `LeetCodeRecommendationResponse`
-- `LeetCodeVerifyProblemResponse`
-- `LeetCodeExclusionMetadata`
+- `LeetCodeLanguageResponse`
+- `LeetCodeSkillResponse`
+- `LeetCodeCalendarResponse`
 - `LeetCodeAppError`
 - `LeetCodeGraphQLResponse<T>`
 
 ## Suggested Implementation Map
 - Route Handlers:
   - `src/app/api/leetcode/user/route.ts`
-  - `src/app/api/leetcode/bio/route.ts`
-  - `src/app/api/leetcode/recommend/route.ts`
-  - `src/app/api/leetcode/verify-problem/route.ts`
+  - `src/app/api/leetcode/language/route.ts`
+  - `src/app/api/leetcode/skill/route.ts`
+  - `src/app/api/leetcode/calendar/route.ts`
 - Server-only LeetCode code:
   - `src/lib/leetcode/client.ts`
   - `src/lib/leetcode/service.ts`
@@ -420,10 +360,11 @@ Mapping rules:
 ## Caching Rules
 - Cache only public GET-style lookups:
   - user info
-  - bio
+  - language stats
+  - skill stats
+  - calendar
 - Use a short in-memory TTL, matching the current solved.ac cache approach.
-- Do not cache recommendation or solved verification POST requests by default.
-- If recommendation later performs expensive public recent-accepted exclusion, consider caching only the upstream recent accepted list by username and limit. Do not cache final recommendation responses unless there is a product reason.
+- No active `/api/leetcode/*` POST endpoint is currently exposed.
 
 ## Environment Variables
 Suggested `.env.example` additions:
@@ -456,8 +397,6 @@ Do not require authenticated variables for the public username MVP.
 - [ ] Add purpose-specific GraphQL query documents.
 - [ ] Add Zod schemas for request input and upstream GraphQL output.
 - [ ] Add user lookup service and route.
-- [ ] Add bio lookup service and route.
-- [ ] Add recommendation service and route with explicit `RECENT_ACCEPTED_SUBMISSIONS` metadata.
-- [ ] Add public recent-accepted verification route returning `SOLVED` or `UNKNOWN`.
-- [ ] Keep session-based `question.status` verification as optional/future work.
-- [ ] Update the UI workbench only after the local `/api/leetcode/*` contract is implemented.
+- [ ] Add language stats service and route.
+- [ ] Add skill stats service and route.
+- [ ] Add calendar service and route.

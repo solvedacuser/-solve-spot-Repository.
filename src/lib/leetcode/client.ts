@@ -1,31 +1,21 @@
 import { z, ZodError, type ZodTypeAny } from "zod";
 import {
   LEETCODE_CALENDAR_QUERY,
-  LEETCODE_CONTEST_QUERY,
   LEETCODE_LANGUAGE_QUERY,
-  LEETCODE_PROBLEMSET_QUERY,
-  LEETCODE_RECENT_ACCEPTED_QUERY,
   LEETCODE_SKILL_QUERY,
   LEETCODE_USER_QUERY,
 } from "@/lib/leetcode/queries";
 import {
   leetCodeCalendarGraphQLDataSchema,
-  leetCodeContestGraphQLDataSchema,
   leetCodeLanguageGraphQLDataSchema,
-  leetCodeProblemsetGraphQLDataSchema,
-  leetCodeRecentAcceptedGraphQLDataSchema,
   leetCodeSkillGraphQLDataSchema,
   leetCodeUserGraphQLDataSchema,
   type LeetCodeCalendarGraphQLData,
-  type LeetCodeContestGraphQLData,
   type LeetCodeLanguageGraphQLData,
-  type LeetCodeProblemsetGraphQLData,
-  type LeetCodeRecentAcceptedGraphQLData,
   type LeetCodeSkillGraphQLData,
   type LeetCodeUserGraphQLData,
 } from "@/lib/leetcode/schemas";
 import { LeetCodeAppError, mapLeetCodeHttpStatusToError } from "@/lib/leetcode/errors";
-import type { LeetCodeDifficulty } from "@/lib/leetcode/types";
 
 const GRAPHQL_URL = process.env.LEETCODE_GRAPHQL_URL ?? "https://leetcode.com/graphql";
 const USER_AGENT = process.env.LEETCODE_USER_AGENT ?? "codemate-next/0.1";
@@ -116,52 +106,6 @@ export async function getLeetCodeUserData(username: string): Promise<LeetCodeUse
   );
 }
 
-export async function getLeetCodeRecentAcceptedData(
-  username: string,
-  limit: number,
-): Promise<LeetCodeRecentAcceptedGraphQLData> {
-  return requestGraphQL(
-    LEETCODE_RECENT_ACCEPTED_QUERY,
-    { username, limit },
-    leetCodeRecentAcceptedGraphQLDataSchema,
-    "LeetCode returned an invalid recent submissions payload.",
-  );
-}
-
-export async function getLeetCodeProblemsetData({
-  difficulty,
-  limit,
-  skip,
-  tagSlugs,
-}: {
-  difficulty?: LeetCodeDifficulty;
-  limit: number;
-  skip: number;
-  tagSlugs: string[];
-}): Promise<LeetCodeProblemsetGraphQLData> {
-  const filters: Record<string, unknown> = {};
-
-  if (difficulty) {
-    filters.difficulty = difficulty;
-  }
-
-  if (tagSlugs.length > 0) {
-    filters.tags = tagSlugs;
-  }
-
-  return requestGraphQL(
-    LEETCODE_PROBLEMSET_QUERY,
-    {
-      categorySlug: "",
-      limit,
-      skip,
-      filters,
-    },
-    leetCodeProblemsetGraphQLDataSchema,
-    "LeetCode returned an invalid problemset payload.",
-  );
-}
-
 export async function getLeetCodeLanguageData(username: string): Promise<LeetCodeLanguageGraphQLData> {
   return requestGraphQL(
     LEETCODE_LANGUAGE_QUERY,
@@ -189,14 +133,5 @@ export async function getLeetCodeCalendarData(
     { username, year },
     leetCodeCalendarGraphQLDataSchema,
     "LeetCode returned an invalid calendar payload.",
-  );
-}
-
-export async function getLeetCodeContestData(username: string): Promise<LeetCodeContestGraphQLData> {
-  return requestGraphQL(
-    LEETCODE_CONTEST_QUERY,
-    { username },
-    leetCodeContestGraphQLDataSchema,
-    "LeetCode returned an invalid contest payload.",
   );
 }

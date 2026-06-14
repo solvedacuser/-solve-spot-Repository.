@@ -9,13 +9,9 @@
 
 ## Current Scope
 - Public LeetCode username lookup.
-- Public LeetCode bio lookup.
 - Public language stats lookup.
 - Public skill/tag stats lookup.
 - Public submission calendar lookup.
-- Public contest ranking/history lookup.
-- Problem recommendation from LeetCode problemset candidates.
-- Solved problem verification using recent accepted submissions.
 
 ## Runtime Stack
 - Next.js App Router.
@@ -39,13 +35,9 @@
 
 ## API Surface
 - `GET /api/leetcode/user?username=...`
-- `GET /api/leetcode/bio?username=...`
 - `GET /api/leetcode/language?username=...`
 - `GET /api/leetcode/skill?username=...`
 - `GET /api/leetcode/calendar?username=...&year=...`
-- `GET /api/leetcode/contest?username=...`
-- `POST /api/leetcode/recommend`
-- `POST /api/leetcode/verify-problem`
 
 ## Identifier Rules
 - Use LeetCode `username` for public user requests.
@@ -55,6 +47,7 @@
 - Derive problem URLs locally as `https://leetcode.com/problems/${titleSlug}/`.
 
 ## Recommendation And Verification Semantics
+- No active `/api/leetcode/*` recommendation or solved-verification endpoint is currently exposed.
 - Public username mode cannot fetch a reliable complete solved-problem list for another user.
 - Recommendations may exclude only problems found in `recentAcSubmissionList(username, limit)`.
 - Recommendation copy and API metadata must not claim exact "unsolved" results in public username mode.
@@ -81,14 +74,10 @@
 ## Caching And Persistence Rules
 - Cache only public GET-style lookups by default:
   - user info
-  - bio
   - language stats
   - skill stats
   - calendar
-  - contest
 - Use short in-memory TTL caching for LeetCode GET lookups.
-- Do not cache final recommendation or solved-verification POST responses by default.
-- If recommendation becomes expensive, cache only upstream recent accepted submissions by username and limit unless there is a product reason to cache final recommendations.
 - Do not add a persistence layer just for the LeetCode migration.
 - If DB-backed history is explicitly scoped later, model LeetCode problems by `titleSlug` and verification status as `SOLVED` or `UNKNOWN`.
 
@@ -103,7 +92,6 @@
 - Roadmap/status notes: `docs/ROADMAP.md`
 - LeetCode Route Handlers: `src/app/api/leetcode/*`
 - LeetCode server-only integration: `src/lib/leetcode/*`
-- LeetCode UI workbench: `src/components/leetcode-workbench.tsx`
 - Legacy solved.ac UI workbench: `src/components/solvedac-workbench.tsx`
 - Shared API response helpers: `src/lib/api-response.ts`
 - Auth forms/helpers: `src/lib/auth/*`, `src/components/auth/*`, `src/app/auth/*`

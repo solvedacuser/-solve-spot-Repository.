@@ -1,7 +1,6 @@
 import { describe, expect, it, vi, afterEach } from "vitest";
 import {
   getLeetCodeCalendarData,
-  getLeetCodeContestData,
   getLeetCodeLanguageData,
   getLeetCodeSkillData,
   getLeetCodeUserData,
@@ -90,18 +89,6 @@ describe("LeetCode GraphQL client", () => {
       status: 502,
     });
 
-    mockFetchResponse({
-      data: {
-        matchedUser: {
-          username: "alice",
-        },
-        userContestRankingHistory: "invalid",
-      },
-    });
-    await expect(getLeetCodeContestData("alice")).rejects.toMatchObject({
-      code: "UPSTREAM_ERROR",
-      status: 502,
-    });
   });
 
   it("maps LeetCode HTTP 429 to RATE_LIMITED", async () => {
